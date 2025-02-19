@@ -1,84 +1,122 @@
 <div class="mainContainer">
+  <!-- Font Awesome for icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   />
   <app-header></app-header>
+
   <div class="container">
+    <!-- LEFT PANEL -->
     <div class="left-panel">
-      <div class="left">
-        <ul>
-          <div>
-            <li>
-              <h4 class="queriestitle">Queries</h4>
-              <button id="addQueryBtn" (click)="addQueries()">+</button>
-            </li>
-            <div id="queryContainer">
-              <!-- Tables will be added here -->
-            </div>
+      <ul>
+        <!-- Queries Section -->
+        <li class="section-header">
+          <h4 class="queriestitle">Queries</h4>
+          <button id="addQueryBtn" (click)="addQueries()">+</button>
+        </li>
+
+        <!-- Render each query as a button -->
+        <div id="queryContainer">
+          <div *ngFor="let query of queries" class="queryItem">
+            <button
+              class="query-button"
+              (click)="openQuery(query)"
+              [ngClass]="{ 'selected-query': selectedQuery === query }"
+            >
+              {{ query.name }}
+            </button>
           </div>
-        </ul>
-      </div>
+        </div>
+      </ul>
+
       <hr />
 
-      <div>
-        <ul>
-          <div>
-            <li>
-              <h4 class="charttitle">Charts</h4>
-              <button id="addchartBtn" (click)="addCharts()">+</button>
-            </li>
-            <div id="chartsContainer">
-              <!-- Tables will be added here -->
-            </div>
-          </div>
-        </ul>
-      </div>
+      <!-- Charts Section -->
+      <ul>
+        <li class="section-header">
+          <h4 class="charttitle">Charts</h4>
+          <button id="addchartBtn" (click)="addCharts()">+</button>
+        </li>
+        <div id="chartsContainer"></div>
+      </ul>
+
       <hr />
-      <div>
-        <ul>
-          <div>
-            <li>
-              <h4 class="dashboardtitle">Dashboard</h4>
-              <button id="adddashboardBtn" (click)="addDashboard()">+</button>
-            </li>
-            <div id="dashboardContainer"></div>
-          </div>
-        </ul>
-      </div>
+
+      <!-- Dashboard Section -->
+      <ul>
+        <li class="section-header">
+          <h4 class="dashboardtitle">Dashboard</h4>
+          <button id="adddashboardBtn" (click)="addDashboard()">+</button>
+        </li>
+        <div id="dashboardContainer"></div>
+      </ul>
     </div>
 
+    <!-- CENTER PANEL (60% width) -->
     <div class="center">
-      <table border="2">
-        <thead>
-          <tr>
-            <th *ngFor="let column of columns">{{ column }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of tabledata">
-            <td *ngFor="let column of columns">{{ row[column] }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- If no query is opened, show a message -->
+      <ng-container *ngIf="selectedQuery; else noQueryOpen">
+        <!-- If this query has no table chosen, show "NO QUERY AVAILABLE" -->
+        <ng-container *ngIf="!selectedQuery.selectedTable; else showTable">
+          <h1>NO QUERY AVAILABLE</h1>
+        </ng-container>
+
+        <!-- If the query does have a selected table, show the table data -->
+        <ng-template #showTable>
+          <table border="2">
+            <thead>
+              <tr>
+                <th *ngFor="let col of selectedQuery.columns">{{ col }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of selectedQuery.tableData">
+                <td *ngFor="let col of selectedQuery.columns">
+                  {{ row[col] }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-template>
+      </ng-container>
+      <ng-template #noQueryOpen>
+        <h1>Please open a query</h1>
+      </ng-template>
     </div>
 
+    <!-- RIGHT PANEL -->
     <div class="right-pannel">
       <div class="detail-box">
         <h4 class="Rdetails">Details</h4>
-        <label for="" class="Rqueriestitle">Query Title</label>
-        <input type="text" class="queriestext" />
+        <label for="queryTitle" class="Rqueriestitle">Query Title</label>
+        <!-- Only editable if a query is opened -->
+        <input
+          id="queryTitle"
+          type="text"
+          class="queriestext"
+          [(ngModel)]="queryTitle"
+          (keyup.enter)="updateSelectedQueryName()"
+          [disabled]="!selectedQuery"
+        />
       </div>
       <hr />
+
       <div>
         <h4 class="Roperations">Operations</h4>
       </div>
 
       <div class="operations-container">
-        <button (click)="toggleOverlay($event)" class="addOperations">
+        <!-- Enable Add Operations only if a query is open -->
+        <button
+          class="addOperations"
+          (click)="toggleOverlay($event)"
+          [disabled]="!selectedQuery"
+        >
           + Add Operations
         </button>
-        <!-- Overlay -->
+
+        <!-- Small overlay with operation options -->
         <div class="overlay" *ngIf="showOverlay" #overlay>
           <ul>
             <li (click)="openTableOverlay()">
@@ -104,25 +142,29 @@
           </ul>
         </div>
 
-        <!-- Centered Table Selection Overlay -->
+        <!-- Select Source Overlay -->
         <div class="table-overlay" *ngIf="showTableOverlay">
           <div class="table-overlay-content">
             <h4>Select a Table</h4>
             <ul>
-              <li *ngFor="let table of tables" (click)="selectTable(table)">
+              <li
+                *ngFor="let table of tables"
+                (click)="selectSourceTable(table)"
+              >
                 {{ table }}
               </li>
             </ul>
-            <button (click)="closeTableOverlay()">Close</button>
+            <button (click)="closeTableOverlay()" class="button">Close</button>
           </div>
         </div>
 
-        <!-- Centered Column Selection Overlay -->
+        <!-- Choose Columns Overlay -->
         <div class="column-overlay" *ngIf="showColumnOverlay">
           <div class="column-overlay-content">
             <h4>Select Columns</h4>
+            <!-- columns for the currently opened query -->
             <ul>
-              <li *ngFor="let column of columns">
+              <li *ngFor="let column of selectedQuery?.columns">
                 <input
                   type="checkbox"
                   [value]="column"
@@ -136,11 +178,10 @@
           </div>
         </div>
 
-        <!-- Centered Add New Column Overlay -->
+        <!-- Add New Column Overlay -->
         <div class="add-column-overlay" *ngIf="showAddColumnOverlay">
           <div class="add-column-content">
             <h3>Add New Column</h3>
-
             <label>Expression:</label>
             <textarea [(ngModel)]="newColumnExpression" rows="3"></textarea>
 
@@ -165,12 +206,11 @@
           </div>
         </div>
 
-        <!-- Centered Join Table Overlay -->
+        <!-- Join Table Overlay -->
         <div class="join-table-overlay" *ngIf="showJoinTableOverlay">
           <div class="join-table-content">
             <h3>Join Table</h3>
 
-            <!-- Table Selection -->
             <label>Select Table:</label>
             <select
               [(ngModel)]="selectedJoinTable"
@@ -181,12 +221,15 @@
               </option>
             </select>
 
-            <!-- Column Selection -->
             <div class="column-selection">
               <label>Join On:</label>
               <div class="join-condition">
+                <!-- Left columns from the open query -->
                 <select [(ngModel)]="selectedLeftColumn">
-                  <option *ngFor="let col of columns" [value]="col">
+                  <option
+                    *ngFor="let col of selectedQuery?.columns"
+                    [value]="col"
+                  >
                     {{ col }}
                   </option>
                 </select>
@@ -199,7 +242,6 @@
               </div>
             </div>
 
-            <!-- Join Type Selection -->
             <label>Join Type:</label>
             <select [(ngModel)]="selectedJoinType">
               <option *ngFor="let join of joinTypes" [value]="join">
@@ -207,10 +249,9 @@
               </option>
             </select>
 
-            <!-- Columns to Include -->
             <label>Columns to Include:</label>
             <select [(ngModel)]="selectedJoinColumns">
-              <option *ngFor="let col of columns" [value]="col">
+              <option *ngFor="let col of selectedQuery?.columns" [value]="col">
                 {{ col }}
               </option>
             </select>
@@ -222,12 +263,10 @@
           </div>
         </div>
 
-        <!-- Overlay for Append Table -->
+        <!-- Append Table Overlay -->
         <div class="append-table-overlay" *ngIf="showAppendTableOverlay">
           <div class="append-table-overlay-content">
             <h4>Append Table</h4>
-
-            <!-- Dropdown to select table -->
             <label>Select Table to Append:</label>
             <select [(ngModel)]="selectedTableToAppend">
               <option *ngFor="let table of tables" [value]="table">
@@ -235,14 +274,12 @@
               </option>
             </select>
 
-            <!-- Dropdown to choose whether to drop duplicates -->
             <label>Drop Duplicates?</label>
             <select [(ngModel)]="dropDuplicates">
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
 
-            <!-- Actions -->
             <div class="append-table-actions">
               <button (click)="confirmAppendTable()">Confirm</button>
               <button (click)="closeAppendTableOverlay()">Cancel</button>
@@ -250,12 +287,10 @@
           </div>
         </div>
 
-        <!-- Overlay for Custom Operation -->
+        <!-- Custom Operation Overlay -->
         <div class="custom-oper-overlay" *ngIf="showCustomOperationOverlay">
           <div class="custom-oper-overlay-content">
             <h4>Custom Operation</h4>
-
-            <!-- Large Text Input for custom expression -->
             <label for="customExpression">Enter Custom Expression:</label>
             <textarea
               id="customExpression"
@@ -264,23 +299,10 @@
               placeholder="Write your custom operation here..."
             ></textarea>
 
-            <!-- Actions -->
             <div class="custom-oper-actions">
               <button (click)="confirmCustomOperation()">Confirm</button>
               <button (click)="closeCustomOperationOverlay()">Close</button>
             </div>
-          </div>
-        </div>
-
-        <div *ngIf="selectedTable" class="selected-info">
-          <div><strong>Selected Table:</strong> {{ selectedTable }}</div>
-          <div>
-            <strong>Selected Columns:</strong>
-            <ul>
-              <li *ngFor="let col of selectedColumns">
-                {{ col }}
-              </li>
-            </ul>
           </div>
         </div>
       </div>
