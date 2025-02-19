@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
 
   columns = []; // stores Column Api data.
   rightcolumns = [];
+  tabledata = []; //stores data of selected
 
   gettabledata() {
     // debugger;
@@ -54,6 +55,12 @@ export class AppComponent implements OnInit {
     this.Apidata.GetColumnApi(table1).subscribe(
       (res: any) => (this.rightcolumns = res)
     );
+  }
+
+  getdata() {
+    this.Apidata.GetData(this.selectedTable).subscribe((res: any) => {
+      this.tabledata = res;
+    });
   }
 
   RightTable(Rtable: string) {
@@ -110,6 +117,7 @@ export class AppComponent implements OnInit {
     this.selectedTable = table;
     console.log('Selected Table:', this.selectedTable);
     this.getcolumndata(table);
+    this.getdata();
     this.showTableOverlay = false; // Close overlay after selection
   }
 

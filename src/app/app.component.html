@@ -1,270 +1,287 @@
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-/>
-<app-header></app-header>
-<div class="container">
-  <div class="left-panel">
-    <div class="left">
-      <ul>
-        <div>
-          <li>
-            <h4 class="queriestitle">Queries</h4>
-            <button id="addQueryBtn" (click)="addQueries()">+</button>
-          </li>
-          <div id="queryContainer">
-            <!-- Tables will be added here -->
-          </div>
-        </div>
-      </ul>
-    </div>
-    <hr />
-
-    <div>
-      <ul>
-        <div>
-          <li>
-            <h4 class="charttitle">Charts</h4>
-            <button id="addchartBtn" (click)="addCharts()">+</button>
-          </li>
-          <div id="chartsContainer">
-            <!-- Tables will be added here -->
-          </div>
-        </div>
-      </ul>
-    </div>
-    <hr />
-    <div>
-      <ul>
-        <div>
-          <li>
-            <h4 class="dashboardtitle">Dashboard</h4>
-            <button id="adddashboardBtn" (click)="addDashboard()">+</button>
-          </li>
-          <div id="dashboardContainer"></div>
-        </div>
-      </ul>
-    </div>
-  </div>
-
-  <div class="center"></div>
-
-  <div class="right-pannel">
-    <div class="detail-box">
-      <h4 class="Rdetails">Details</h4>
-      <label for="" class="Rqueriestitle">Query Title</label>
-      <input type="text" class="queriestext" />
-    </div>
-    <hr />
-    <div>
-      <h4 class="Roperations">Operations</h4>
-    </div>
-
-    <div class="operations-container">
-      <button (click)="toggleOverlay($event)" class="addOperations">
-        + Add Operations
-      </button>
-      <!-- Overlay -->
-      <div class="overlay" *ngIf="showOverlay" #overlay>
+<div class="mainContainer">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+  <app-header></app-header>
+  <div class="container">
+    <div class="left-panel">
+      <div class="left">
         <ul>
-          <li (click)="openTableOverlay()">
-            <i class="fa-solid fa-database"></i>Select Source
-          </li>
-          <li (click)="openColumnOverlay()">
-            <i class="fa-solid fa-table-columns"></i>Choose Columns
-          </li>
-          <li><i class="fa-solid fa-filter"></i>Filter Rows</li>
-          <li (click)="openJoinTableOverlay()">
-            <i class="fa-solid fa-circle-half-stroke"></i>Join Table
-          </li>
-          <li (click)="openAppendTableOverlay()">
-            <i class="fa-solid fa-layer-group"></i>Append Table
-          </li>
-          <li (click)="openAddColumnOverlay()">
-            <i class="fa-solid fa-florin-sign"></i>Add New Column
-          </li>
-          <li><i class="fa-solid fa-object-group"></i>Group and Summarize</li>
-          <li (click)="openCustomOperationOverlay()">
-            <i class="fa-sharp fa-solid fa-worm"></i>Custom Operation
-          </li>
-        </ul>
-      </div>
-
-      <!-- Centered Table Selection Overlay -->
-      <div class="table-overlay" *ngIf="showTableOverlay">
-        <div class="table-overlay-content">
-          <h4>Select a Table</h4>
-          <ul>
-            <li *ngFor="let table of tables" (click)="selectTable(table)">
-              {{ table }}
+          <div>
+            <li>
+              <h4 class="queriestitle">Queries</h4>
+              <button id="addQueryBtn" (click)="addQueries()">+</button>
             </li>
-          </ul>
-          <button (click)="closeTableOverlay()">Close</button>
-        </div>
-      </div>
-
-      <!-- Centered Column Selection Overlay -->
-      <div class="column-overlay" *ngIf="showColumnOverlay">
-        <div class="column-overlay-content">
-          <h4>Select Columns</h4>
-          <ul>
-            <li *ngFor="let column of columns">
-              <input
-                type="checkbox"
-                [value]="column"
-                (change)="toggleColumnSelection(column, $event)"
-              />
-              {{ column }}
-            </li>
-          </ul>
-          <button (click)="confirmColumnSelection()">Confirm</button>
-          <button (click)="closeColumnOverlay()">Close</button>
-        </div>
-      </div>
-
-      <!-- Centered Add New Column Overlay -->
-      <div class="add-column-overlay" *ngIf="showAddColumnOverlay">
-        <div class="add-column-content">
-          <h3>Add New Column</h3>
-
-          <label>Expression:</label>
-          <textarea [(ngModel)]="newColumnExpression" rows="3"></textarea>
-
-          <label>Column Name:</label>
-          <input
-            type="text"
-            [(ngModel)]="newColumnName"
-            placeholder="Enter column name"
-          />
-
-          <label>Column Type:</label>
-          <select [(ngModel)]="newColumnType">
-            <option *ngFor="let type of columnTypes" [value]="type">
-              {{ type }}
-            </option>
-          </select>
-
-          <div class="buttons">
-            <button (click)="confirmAddColumn()">Confirm</button>
-            <button (click)="closeAddColumnOverlay()">Close</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Centered Join Table Overlay -->
-      <div class="join-table-overlay" *ngIf="showJoinTableOverlay">
-        <div class="join-table-content">
-          <h3>Join Table</h3>
-
-          <!-- Table Selection -->
-          <label>Select Table:</label>
-          <select
-            [(ngModel)]="selectedJoinTable"
-            (ngModelChange)="RightTable($event)"
-          >
-            <option *ngFor="let table of tables" [value]="table">
-              {{ table }}
-            </option>
-          </select>
-
-          <!-- Column Selection -->
-          <div class="column-selection">
-            <label>Join On:</label>
-            <div class="join-condition">
-              <select [(ngModel)]="selectedLeftColumn">
-                <option *ngFor="let col of columns" [value]="col">
-                  {{ col }}
-                </option>
-              </select>
-              <span>=</span>
-              <select [(ngModel)]="selectedRightColumn">
-                <option *ngFor="let col of rightcolumns" [value]="col">
-                  {{ col }}
-                </option>
-              </select>
+            <div id="queryContainer">
+              <!-- Tables will be added here -->
             </div>
           </div>
+        </ul>
+      </div>
+      <hr />
 
-          <!-- Join Type Selection -->
-          <label>Join Type:</label>
-          <select [(ngModel)]="selectedJoinType">
-            <option *ngFor="let join of joinTypes" [value]="join">
-              {{ join }}
-            </option>
-          </select>
-
-          <!-- Columns to Include -->
-          <label>Columns to Include:</label>
-          <select [(ngModel)]="selectedJoinColumns">
-            <option *ngFor="let col of columns" [value]="col">{{ col }}</option>
-          </select>
-
-          <div class="buttons">
-            <button (click)="confirmJoinTable()">Confirm</button>
-            <button (click)="closeJoinTableOverlay()">Close</button>
+      <div>
+        <ul>
+          <div>
+            <li>
+              <h4 class="charttitle">Charts</h4>
+              <button id="addchartBtn" (click)="addCharts()">+</button>
+            </li>
+            <div id="chartsContainer">
+              <!-- Tables will be added here -->
+            </div>
           </div>
-        </div>
+        </ul>
+      </div>
+      <hr />
+      <div>
+        <ul>
+          <div>
+            <li>
+              <h4 class="dashboardtitle">Dashboard</h4>
+              <button id="adddashboardBtn" (click)="addDashboard()">+</button>
+            </li>
+            <div id="dashboardContainer"></div>
+          </div>
+        </ul>
+      </div>
+    </div>
+
+    <div class="center">
+      <table border="2">
+        <thead>
+          <tr>
+            <th *ngFor="let column of columns">{{ column }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of tabledata">
+            <td *ngFor="let column of columns">{{ row[column] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="right-pannel">
+      <div class="detail-box">
+        <h4 class="Rdetails">Details</h4>
+        <label for="" class="Rqueriestitle">Query Title</label>
+        <input type="text" class="queriestext" />
+      </div>
+      <hr />
+      <div>
+        <h4 class="Roperations">Operations</h4>
       </div>
 
-      <!-- Overlay for Append Table -->
-      <div class="append-table-overlay" *ngIf="showAppendTableOverlay">
-        <div class="append-table-overlay-content">
-          <h4>Append Table</h4>
-
-          <!-- Dropdown to select table -->
-          <label>Select Table to Append:</label>
-          <select [(ngModel)]="selectedTableToAppend">
-            <option *ngFor="let table of tables" [value]="table">
-              {{ table }}
-            </option>
-          </select>
-
-          <!-- Dropdown to choose whether to drop duplicates -->
-          <label>Drop Duplicates?</label>
-          <select [(ngModel)]="dropDuplicates">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-
-          <!-- Actions -->
-          <div class="append-table-actions">
-            <button (click)="confirmAppendTable()">Confirm</button>
-            <button (click)="closeAppendTableOverlay()">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Overlay for Custom Operation -->
-      <div class="custom-oper-overlay" *ngIf="showCustomOperationOverlay">
-        <div class="custom-oper-overlay-content">
-          <h4>Custom Operation</h4>
-
-          <!-- Large Text Input for custom expression -->
-          <label for="customExpression">Enter Custom Expression:</label>
-          <textarea
-            id="customExpression"
-            [(ngModel)]="customExpression"
-            rows="6"
-            placeholder="Write your custom operation here..."
-          ></textarea>
-
-          <!-- Actions -->
-          <div class="custom-oper-actions">
-            <button (click)="confirmCustomOperation()">Confirm</button>
-            <button (click)="closeCustomOperationOverlay()">Close</button>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="selectedTable" class="selected-info">
-        <div><strong>Selected Table:</strong> {{ selectedTable }}</div>
-        <div>
-          <strong>Selected Columns:</strong>
+      <div class="operations-container">
+        <button (click)="toggleOverlay($event)" class="addOperations">
+          + Add Operations
+        </button>
+        <!-- Overlay -->
+        <div class="overlay" *ngIf="showOverlay" #overlay>
           <ul>
-            <li *ngFor="let col of selectedColumns">
-              {{ col }}
+            <li (click)="openTableOverlay()">
+              <i class="fa-solid fa-database"></i>Select Source
+            </li>
+            <li (click)="openColumnOverlay()">
+              <i class="fa-solid fa-table-columns"></i>Choose Columns
+            </li>
+            <li><i class="fa-solid fa-filter"></i>Filter Rows</li>
+            <li (click)="openJoinTableOverlay()">
+              <i class="fa-solid fa-circle-half-stroke"></i>Join Table
+            </li>
+            <li (click)="openAppendTableOverlay()">
+              <i class="fa-solid fa-layer-group"></i>Append Table
+            </li>
+            <li (click)="openAddColumnOverlay()">
+              <i class="fa-solid fa-florin-sign"></i>Add New Column
+            </li>
+            <li><i class="fa-solid fa-object-group"></i>Group and Summarize</li>
+            <li (click)="openCustomOperationOverlay()">
+              <i class="fa-sharp fa-solid fa-worm"></i>Custom Operation
             </li>
           </ul>
+        </div>
+
+        <!-- Centered Table Selection Overlay -->
+        <div class="table-overlay" *ngIf="showTableOverlay">
+          <div class="table-overlay-content">
+            <h4>Select a Table</h4>
+            <ul>
+              <li *ngFor="let table of tables" (click)="selectTable(table)">
+                {{ table }}
+              </li>
+            </ul>
+            <button (click)="closeTableOverlay()">Close</button>
+          </div>
+        </div>
+
+        <!-- Centered Column Selection Overlay -->
+        <div class="column-overlay" *ngIf="showColumnOverlay">
+          <div class="column-overlay-content">
+            <h4>Select Columns</h4>
+            <ul>
+              <li *ngFor="let column of columns">
+                <input
+                  type="checkbox"
+                  [value]="column"
+                  (change)="toggleColumnSelection(column, $event)"
+                />
+                {{ column }}
+              </li>
+            </ul>
+            <button (click)="confirmColumnSelection()">Confirm</button>
+            <button (click)="closeColumnOverlay()">Close</button>
+          </div>
+        </div>
+
+        <!-- Centered Add New Column Overlay -->
+        <div class="add-column-overlay" *ngIf="showAddColumnOverlay">
+          <div class="add-column-content">
+            <h3>Add New Column</h3>
+
+            <label>Expression:</label>
+            <textarea [(ngModel)]="newColumnExpression" rows="3"></textarea>
+
+            <label>Column Name:</label>
+            <input
+              type="text"
+              [(ngModel)]="newColumnName"
+              placeholder="Enter column name"
+            />
+
+            <label>Column Type:</label>
+            <select [(ngModel)]="newColumnType">
+              <option *ngFor="let type of columnTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+
+            <div class="buttons">
+              <button (click)="confirmAddColumn()">Confirm</button>
+              <button (click)="closeAddColumnOverlay()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Centered Join Table Overlay -->
+        <div class="join-table-overlay" *ngIf="showJoinTableOverlay">
+          <div class="join-table-content">
+            <h3>Join Table</h3>
+
+            <!-- Table Selection -->
+            <label>Select Table:</label>
+            <select
+              [(ngModel)]="selectedJoinTable"
+              (ngModelChange)="RightTable($event)"
+            >
+              <option *ngFor="let table of tables" [value]="table">
+                {{ table }}
+              </option>
+            </select>
+
+            <!-- Column Selection -->
+            <div class="column-selection">
+              <label>Join On:</label>
+              <div class="join-condition">
+                <select [(ngModel)]="selectedLeftColumn">
+                  <option *ngFor="let col of columns" [value]="col">
+                    {{ col }}
+                  </option>
+                </select>
+                <span>=</span>
+                <select [(ngModel)]="selectedRightColumn">
+                  <option *ngFor="let col of rightcolumns" [value]="col">
+                    {{ col }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Join Type Selection -->
+            <label>Join Type:</label>
+            <select [(ngModel)]="selectedJoinType">
+              <option *ngFor="let join of joinTypes" [value]="join">
+                {{ join }}
+              </option>
+            </select>
+
+            <!-- Columns to Include -->
+            <label>Columns to Include:</label>
+            <select [(ngModel)]="selectedJoinColumns">
+              <option *ngFor="let col of columns" [value]="col">
+                {{ col }}
+              </option>
+            </select>
+
+            <div class="buttons">
+              <button (click)="confirmJoinTable()">Confirm</button>
+              <button (click)="closeJoinTableOverlay()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overlay for Append Table -->
+        <div class="append-table-overlay" *ngIf="showAppendTableOverlay">
+          <div class="append-table-overlay-content">
+            <h4>Append Table</h4>
+
+            <!-- Dropdown to select table -->
+            <label>Select Table to Append:</label>
+            <select [(ngModel)]="selectedTableToAppend">
+              <option *ngFor="let table of tables" [value]="table">
+                {{ table }}
+              </option>
+            </select>
+
+            <!-- Dropdown to choose whether to drop duplicates -->
+            <label>Drop Duplicates?</label>
+            <select [(ngModel)]="dropDuplicates">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+
+            <!-- Actions -->
+            <div class="append-table-actions">
+              <button (click)="confirmAppendTable()">Confirm</button>
+              <button (click)="closeAppendTableOverlay()">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overlay for Custom Operation -->
+        <div class="custom-oper-overlay" *ngIf="showCustomOperationOverlay">
+          <div class="custom-oper-overlay-content">
+            <h4>Custom Operation</h4>
+
+            <!-- Large Text Input for custom expression -->
+            <label for="customExpression">Enter Custom Expression:</label>
+            <textarea
+              id="customExpression"
+              [(ngModel)]="customExpression"
+              rows="6"
+              placeholder="Write your custom operation here..."
+            ></textarea>
+
+            <!-- Actions -->
+            <div class="custom-oper-actions">
+              <button (click)="confirmCustomOperation()">Confirm</button>
+              <button (click)="closeCustomOperationOverlay()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedTable" class="selected-info">
+          <div><strong>Selected Table:</strong> {{ selectedTable }}</div>
+          <div>
+            <strong>Selected Columns:</strong>
+            <ul>
+              <li *ngFor="let col of selectedColumns">
+                {{ col }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

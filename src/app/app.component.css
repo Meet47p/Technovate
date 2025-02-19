@@ -4,6 +4,13 @@
   font-family: "IBM Plex Sans", sans-serif;
 }
 
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: hidden;
+}
+
 /* Ensure .container flexbox is well-defined */
 .container {
   display: flex;
@@ -28,6 +35,17 @@
 }
 
 .center {
+  flex-grow: 1; /* Take up remaining space */
+  width: 60%;
+  height: 100vh;
+  border: 1px solid #ccc;
+  max-height: 87%;
+  border-radius: 9px;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column; /* Align children in a column */
+  align-items: flex-start; /* Align content to the top */
   flex-grow: 1; /* Take up remaining space */
 }
 
@@ -373,3 +391,17 @@ input[type="checkbox"] {
   width: 20px;
   text-align: center;
 } */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+th {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
