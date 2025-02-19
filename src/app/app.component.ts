@@ -1,15 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from './Services/api.service';
+import { HeaderComponent } from './components/header/header.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule, HeaderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.gettabledata();
     // this.getcolumndata();
@@ -23,47 +31,51 @@ export class AppComponent implements OnInit{
   showAppendTableOverlay = false;
   showCustomOperationOverlay = false;
 
-Apidata=inject(ApiService)
+  Apidata = inject(ApiService);
   tables = []; //stores table Api data.
-  selectedTable:string='';
+  selectedTable: string = '';
 
   columns = []; // stores Column Api data.
-  rightcolumns=[];
+  rightcolumns = [];
 
-  gettabledata(){
-    debugger;
-    this.Apidata.GetTableApi().subscribe((res:any)=>
-      this.tables=res
+  gettabledata() {
+    // debugger;
+    this.Apidata.GetTableApi().subscribe((res: any) => (this.tables = res));
+  }
+
+  getcolumndata(table1: string) {
+    // debugger;
+    this.Apidata.GetColumnApi(table1).subscribe(
+      (res: any) => (this.columns = res)
     );
   }
- 
-  getcolumndata(table1:string){
-    debugger;
-    this.Apidata.GetColumnApi(table1).subscribe((res:any)=>
-      this.columns=res
-    );
-  }
-  getrightcolumndata(table1:string){
-    debugger;
-    this.Apidata.GetColumnApi(table1).subscribe((res:any)=>
-      this.rightcolumns=res
+  getrightcolumndata(table1: string) {
+    // debugger;
+    this.Apidata.GetColumnApi(table1).subscribe(
+      (res: any) => (this.rightcolumns = res)
     );
   }
 
-  RightTable(Rtable:string){
-    debugger;
+  RightTable(Rtable: string) {
+    // debugger;
     // const selectedvalue=(Rtable.target as HTMLSelectElement).value;
     this.getrightcolumndata(Rtable);
   }
-
 
   selectedColumns: string[] = [];
 
   newColumnExpression = '';
   newColumnName = '';
   newColumnType = '';
-  columnTypes = ['String', 'Text', 'Integer', 'Decimal', 'Date', 'Time', 'Datetime'];
-
+  columnTypes = [
+    'String',
+    'Text',
+    'Integer',
+    'Decimal',
+    'Date',
+    'Time',
+    'Datetime',
+  ];
 
   selectedJoinTable = '';
   selectedLeftColumn = '';
@@ -72,17 +84,12 @@ Apidata=inject(ApiService)
   selectedJoinColumns: string[] = [];
   joinTypes = ['Inner Join', 'Left Join', 'Right Join', 'Full Join'];
 
-
   selectedTableToAppend: string = '';
-  dropDuplicates: string = 'No';  // Default to "No"
+  dropDuplicates: string = 'No'; // Default to "No"
 
-
-  customExpression: string = '';  // Store the custom expression
-
+  customExpression: string = ''; // Store the custom expression
 
   @ViewChild('overlay') overlay!: ElementRef;
-
-
 
   //On add operations button it is implemented just to show or not show the small overlay.
   toggleOverlay(event: Event) {
@@ -100,7 +107,7 @@ Apidata=inject(ApiService)
   //When tables get displayed and then when we select any of table that time it gets triggered.
   //It console logs the selected table and and also hides away the table overlay.
   selectTable(table: string) {
-    this.selectedTable=table;
+    this.selectedTable = table;
     console.log('Selected Table:', this.selectedTable);
     this.getcolumndata(table);
     this.showTableOverlay = false; // Close overlay after selection
@@ -118,7 +125,7 @@ Apidata=inject(ApiService)
   }
 
   //When the columns are displayed at checkboxes, at that time when u select them or unselect them this func gets triggered.
-  //It first checks whether it is checkwd or not than if checked than adds that column into the selectedColumn array and 
+  //It first checks whether it is checkwd or not than if checked than adds that column into the selectedColumn array and
   // if it gets unchecked than that column is removed from the selectedcolumn array.
   toggleColumnSelection(column: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
@@ -127,7 +134,9 @@ Apidata=inject(ApiService)
         this.selectedColumns.push(column);
       }
     } else {
-      this.selectedColumns = this.selectedColumns.filter(col => col !== column);
+      this.selectedColumns = this.selectedColumns.filter(
+        (col) => col !== column
+      );
     }
   }
 
@@ -153,7 +162,7 @@ Apidata=inject(ApiService)
     console.log('New Column Details:', {
       Expression: this.newColumnExpression,
       Name: this.newColumnName,
-      Type: this.newColumnType
+      Type: this.newColumnType,
     });
     this.showAddColumnOverlay = false;
   }
@@ -174,7 +183,7 @@ Apidata=inject(ApiService)
       LeftColumn: this.selectedLeftColumn,
       RightColumn: this.selectedRightColumn,
       JoinType: this.selectedJoinType,
-      SelectedColumns: this.selectedJoinColumns
+      SelectedColumns: this.selectedJoinColumns,
     });
     this.showJoinTableOverlay = false;
   }
@@ -182,7 +191,6 @@ Apidata=inject(ApiService)
   closeJoinTableOverlay() {
     this.showJoinTableOverlay = false;
   }
-
 
   openAppendTableOverlay() {
     this.showAppendTableOverlay = true;
@@ -193,7 +201,7 @@ Apidata=inject(ApiService)
   confirmAppendTable() {
     console.log('Selected Table to Append:', this.selectedTableToAppend);
     console.log('Drop Duplicates:', this.dropDuplicates);
-    this.closeAppendTableOverlay();  // Close overlay after confirming
+    this.closeAppendTableOverlay(); // Close overlay after confirming
   }
 
   // Close the overlay
@@ -209,7 +217,7 @@ Apidata=inject(ApiService)
   // Confirm and log the custom expression
   confirmCustomOperation() {
     console.log('Custom Expression:', this.customExpression);
-    this.closeCustomOperationOverlay();  // Close overlay after confirming
+    this.closeCustomOperationOverlay(); // Close overlay after confirming
   }
 
   // Close the overlay without saving
@@ -220,40 +228,43 @@ Apidata=inject(ApiService)
   // Close overlay when clicking outside
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (this.overlay && this.showOverlay && !this.overlay.nativeElement.contains(event.target)) {
+    if (
+      this.overlay &&
+      this.showOverlay &&
+      !this.overlay.nativeElement.contains(event.target)
+    ) {
       this.showOverlay = false;
     }
   }
 
-  queryCount:number = 0; // Counter to track the number of tables
-  chartsCount:number=0;
-  dashboardCount:number=0;
+  queryCount: number = 0; // Counter to track the number of tables
+  chartsCount: number = 0;
+  dashboardCount: number = 0;
 
-   addQueries() {
+  addQueries() {
     this.queryCount++; // Increment counter
     // Create a new div for the table name
-    const newTableDiv = document.createElement("div");
+    const newTableDiv = document.createElement('div');
     newTableDiv.textContent = `Queries ${this.queryCount}`;
     // newTableDiv.style.marginTop = "5px"; // Add some spacing
     // Append the new table label to the container
-    document.getElementById("queryContainer")?.appendChild(newTableDiv);
+    document.getElementById('queryContainer')?.appendChild(newTableDiv);
   }
-  addCharts(){
+  addCharts() {
     this.chartsCount++; // Increment counter
     // Create a new div for the table name
-    const newTableDiv = document.createElement("div");
+    const newTableDiv = document.createElement('div');
     newTableDiv.textContent = `charts ${this.chartsCount}`;
     // Append the new table label to the container
-    document.getElementById("chartsContainer")?.appendChild(newTableDiv);
+    document.getElementById('chartsContainer')?.appendChild(newTableDiv);
   }
-  addDashboard(){
+  addDashboard() {
     this.dashboardCount++; // Increment counter
     // Create a new div for the table name
-    const newTableDiv = document.createElement("div");
+    const newTableDiv = document.createElement('div');
     newTableDiv.textContent = `dashboard ${this.dashboardCount}`;
-   
-    // Append the new table label to the container
-    document.getElementById("dashboardContainer")?.appendChild(newTableDiv);
-  }
 
+    // Append the new table label to the container
+    document.getElementById('dashboardContainer')?.appendChild(newTableDiv);
+  }
 }
