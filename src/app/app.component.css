@@ -71,9 +71,17 @@ table {
   border: 1px solid #ccc;
 }
 
-th,
+
 td {
   padding: 8px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+th{
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  background: white;
   text-align: center;
   border: 1px solid #ccc;
 }
@@ -104,8 +112,13 @@ hr {
 #adddashboardBtn {
   position: relative;
   top: -26px;
-  left: 190px;
-  border: 0.5px solid black;
+  left: 80%;
+  border: none;
+  font-size: x-large;
+  padding-top: 0%;
+  padding-left: 5%;
+  padding-right: 5%;
+  padding-bottom: 1.5%;
   border-radius: 8px;
   /* visibility: hidden; */
 }
@@ -579,16 +592,18 @@ label {
 
 .queryItem {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   padding: 8px;
   /* border-bottom: 1px solid #ccc; */
 }
 
 .delete-button {
+  position: relative;
   width: 45px;
   height: 20px;
   margin-top: 2px;
   padding: 0px;
+  left: 1.2%;
   border: none !important;
   /* visibility: hidden; */
 }
