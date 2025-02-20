@@ -187,7 +187,7 @@ export class AppComponent implements OnInit {
 
   // Query Methods
   addQueries() {
-    this.queryCount++;
+    this.queryCount = this.queries.length + 1;
     this.queries.push({
       id: this.queryCount,
       name: `Query ${this.queryCount}`,
