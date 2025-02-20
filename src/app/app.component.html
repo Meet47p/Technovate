@@ -14,7 +14,7 @@
             <button id="addQueryBtn" (click)="addQueries()">+</button>
           </li>
           <div id="queryContainer">
-            <!-- Render queries using *ngFor -->
+            <!-- Render queries as plain text with hover and selection styling -->
             <div *ngFor="let query of queries" class="queryItem">
               <button
                 class="query-button"
@@ -35,7 +35,7 @@
             <button id="addchartBtn" (click)="addCharts()">+</button>
           </li>
           <div id="chartsContainer">
-            <!-- Charts content -->
+            <!-- Charts content remains unchanged -->
           </div>
         </ul>
       </div>
@@ -53,22 +53,38 @@
     <!-- CENTER PANEL -->
     <div class="center">
       <ng-container *ngIf="selectedQuery; else noQueryOpen">
-        <ng-container *ngIf="!selectedQuery.selectedTable; else showTable">
-          <h1>NO QUERY AVAILABLE</h1>
-        </ng-container>
-        <ng-template #showTable>
+        <ng-container *ngIf="selectedQuery.selectedTable; else noTable">
           <table border="2">
             <thead>
               <tr>
-                <th *ngFor="let column of columns">{{ column }}</th>
+                <th
+                  *ngFor="
+                    let column of selectedColumns.length
+                      ? selectedColumns
+                      : columns
+                  "
+                >
+                  {{ column }}
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let row of tabledata">
-                <td *ngFor="let column of columns">{{ row[column] }}</td>
+                <td
+                  *ngFor="
+                    let column of selectedColumns.length
+                      ? selectedColumns
+                      : columns
+                  "
+                >
+                  {{ row[column] }}
+                </td>
               </tr>
             </tbody>
           </table>
+        </ng-container>
+        <ng-template #noTable>
+          <h1>NO QUERY AVAILABLE</h1>
         </ng-template>
       </ng-container>
       <ng-template #noQueryOpen>
@@ -147,6 +163,7 @@
                 <input
                   type="checkbox"
                   [value]="column"
+                  [checked]="selectedColumns.includes(column)"
                   (change)="toggleColumnSelection(column, $event)"
                 />
                 {{ column }}
@@ -266,24 +283,102 @@
           <div>
             <strong>Selected Columns:</strong>
             <ul>
-              <li *ngFor="let col of selectedColumns">
-                {{ col }}
-              </li>
+              <li *ngFor="let col of selectedColumns">{{ col }}</li>
             </ul>
           </div>
         </div>
-      </div>
-      <!-- Filter Rows Overlay -->
-      <div class="filter-row-overlay" *ngIf="showFilterRowsOverlay">
-        <div class="filter-row-overlay-content">
-          <h4>Filter Rows</h4>
-          <div *ngFor="let filter of filters; let i = index">
-            <div class="filter-row-main">
-              <p>Where</p>
-              <select
-                [(ngModel)]="filter.column"
-                (change)="updateOperations(i)"
+        <!-- Filter Rows Overlay -->
+        <div class="filter-row-overlay" *ngIf="showFilterRowsOverlay">
+          <div class="filter-row-overlay-content">
+            <h4>Filter Rows</h4>
+
+            <div *ngFor="let filter of filters; let i = index">
+              <div class="filter-row-main">
+                <p>Where</p>
+
+                <!-- Select Column -->
+                <select
+                  [(ngModel)]="filter.column"
+                  (change)="updateOperations(i)"
+                >
+                  <option
+                    *ngFor="let column of filterColumns"
+                    [value]="column.name"
+                  >
+                    {{ column.name }}
+                  </option>
+                </select>
+
+                <!-- Select Operation -->
+                <select
+                  [(ngModel)]="filter.operation"
+                  (change)="updateValues(i)"
+                >
+                  <option
+                    *ngFor="let op of filter.availableOperations"
+                    [value]="op"
+                  >
+                    {{ op }}
+                  </option>
+                </select>
+
+                <!-- Select Value -->
+                <select [(ngModel)]="filter.value">
+                  <option
+                    *ngFor="let val of filter.availableValues"
+                    [value]="val"
+                  >
+                    {{ val }}
+                  </option>
+                </select>
+
+                <!-- AND/OR Dropdown -->
+                <select
+                  [(ngModel)]="filter.condition"
+                  *ngIf="i !== filters.length - 1"
+                >
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
+                </select>
+              </div>
+
+              <!-- Remove Button -->
+              <button
+                class="filter-row-remove-btn"
+                (click)="removeFilter(i)"
+                *ngIf="filters.length > 1"
               >
+                Remove
+              </button>
+            </div>
+
+            <!-- Add Filter Button -->
+            <button class="filter-row-add-btn" (click)="addFilter()">
+              Add Filter
+            </button>
+
+            <!-- Actions -->
+            <div class="filter-row-actions">
+              <button (click)="clearFilters()">Clear</button>
+              <button (click)="applyFilters()">Apply Filters</button>
+              <button (click)="closeFilterRowsOverlay()">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group and Summarize Overlay -->
+        <div class="gas-overlay" *ngIf="showGroupSummarizeOverlay">
+          <div class="gas-overlay-content">
+            <h4>Group and Summarize</h4>
+
+            <div
+              *ngFor="let group of groupings; let i = index"
+              class="gas-grouping-container"
+            >
+              <!-- Label and Dropdown for Group By Column -->
+              <label>Group By Column:</label>
+              <select [(ngModel)]="group.groupByColumn">
+                <option value="" disabled selected>Select a column</option>
                 <option
                   *ngFor="let column of filterColumns"
                   [value]="column.name"
@@ -291,102 +386,56 @@
                   {{ column.name }}
                 </option>
               </select>
-              <select [(ngModel)]="filter.operation" (change)="updateValues(i)">
-                <option
-                  *ngFor="let op of filter.availableOperations"
-                  [value]="op"
-                >
-                  {{ op }}
+
+              <!-- Label and Dropdown for Aggregate Function -->
+              <label>Aggregate Function:</label>
+              <select [(ngModel)]="group.aggregateFunction">
+                <option value="" disabled selected>Select a function</option>
+                <option *ngFor="let func of aggregateFunctions" [value]="func">
+                  {{ func }}
                 </option>
               </select>
-              <select [(ngModel)]="filter.value">
+
+              <!-- Label and Dropdown for Aggregate Column -->
+              <label>Column to Apply Aggregation On:</label>
+              <select [(ngModel)]="group.aggregateColumn">
+                <option value="" disabled selected>Select a column</option>
                 <option
-                  *ngFor="let val of filter.availableValues"
-                  [value]="val"
+                  *ngFor="let column of filterColumns"
+                  [value]="column.name"
                 >
-                  {{ val }}
+                  {{ column.name }}
                 </option>
               </select>
-              <select
-                [(ngModel)]="filter.condition"
-                *ngIf="i !== filters.length - 1"
+
+              <!-- Remove Button -->
+              <button
+                class="gas-remove-btn"
+                (click)="removeGrouping(i)"
+                *ngIf="groupings.length > 1"
               >
-                <option value="AND">AND</option>
-                <option value="OR">OR</option>
-              </select>
+                Remove
+              </button>
             </div>
-            <button
-              class="filter-row-remove-btn"
-              (click)="removeFilter(i)"
-              *ngIf="filters.length > 1"
-            >
-              Remove
+
+            <!-- Add Grouping Button -->
+            <button class="gas-add-btn" (click)="addGrouping()">
+              Add Grouping
             </button>
-          </div>
-          <button class="filter-row-add-btn" (click)="addFilter()">
-            Add Filter
-          </button>
-          <div class="filter-row-actions">
-            <button (click)="clearFilters()">Clear</button>
-            <button (click)="applyFilters()">Apply Filters</button>
-            <button (click)="closeFilterRowsOverlay()">Close</button>
+
+            <!-- Actions -->
+            <div class="gas-actions">
+              <button (click)="clearGroupings()">Clear</button>
+              <button (click)="applyGroupings()">Apply</button>
+              <button (click)="closeGroupSummarizeOverlay()">Close</button>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Group and Summarize Overlay -->
-      <div class="gas-overlay" *ngIf="showGroupSummarizeOverlay">
-        <div class="gas-overlay-content">
-          <h4>Group and Summarize</h4>
-          <div
-            *ngFor="let group of groupings; let i = index"
-            class="gas-grouping-container"
-          >
-            <label>Group By Column:</label>
-            <select [(ngModel)]="group.groupByColumn">
-              <option value="" disabled selected>Select a column</option>
-              <option
-                *ngFor="let column of filterColumns"
-                [value]="column.name"
-              >
-                {{ column.name }}
-              </option>
-            </select>
-            <label>Aggregate Function:</label>
-            <select [(ngModel)]="group.aggregateFunction">
-              <option value="" disabled selected>Select a function</option>
-              <option *ngFor="let func of aggregateFunctions" [value]="func">
-                {{ func }}
-              </option>
-            </select>
-            <label>Column to Apply Aggregation On:</label>
-            <select [(ngModel)]="group.aggregateColumn">
-              <option value="" disabled selected>Select a column</option>
-              <option
-                *ngFor="let column of filterColumns"
-                [value]="column.name"
-              >
-                {{ column.name }}
-              </option>
-            </select>
-            <button
-              class="gas-remove-btn"
-              (click)="removeGrouping(i)"
-              *ngIf="groupings.length > 1"
-            >
-              Remove
-            </button>
-          </div>
-          <button class="gas-add-btn" (click)="addGrouping()">
-            Add Grouping
-          </button>
-          <div class="gas-actions">
-            <button (click)="clearGroupings()">Clear</button>
-            <button (click)="applyGroupings()">Apply</button>
-            <button (click)="closeGroupSummarizeOverlay()">Close</button>
-          </div>
-        </div>
+        <!-- </ng-container> -->
+        <ng-template #noQueryOpen>
+          <h1>Please open a query</h1>
+        </ng-template>
       </div>
     </div>
   </div>
 </div>
-<!-- HELLO HELLO -->

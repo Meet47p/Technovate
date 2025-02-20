@@ -3,14 +3,15 @@ import {
   Component,
   ElementRef,
   HostListener,
-  inject,
   OnInit,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './Services/api.service';
 import { HeaderComponent } from './components/header/header.component';
 
+// Extend the Query interface
 interface Query {
   id: number;
   name: string;
@@ -28,11 +29,10 @@ interface Query {
 export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.gettabledata();
-    // this.getcolumndata();
   }
   title = 'DynamicDahboard';
 
-  // Overlays
+  // Overlays and flags (unchanged)
   showOverlay = false;
   showTableOverlay = false;
   showColumnOverlay = false;
@@ -43,15 +43,21 @@ export class AppComponent implements OnInit {
   showFilterRowsOverlay = false;
   showGroupSummarizeOverlay = false;
 
-  // API data and existing properties
   Apidata = inject(ApiService);
-  tables = []; // stores table API data.
+  tables: any[] = [];
   selectedTable: string = '';
-  columns = []; // stores Column API data.
-  rightcolumns = [];
-  tabledata = []; // stores data of selected
 
-  // (Other properties for filters, join, grouping, etc. remain intact)
+  columns: string[] = [];
+  rightcolumns: string[] = [];
+  tabledata: any[] = [];
+
+  // ***** Query Management *****
+  queries: Query[] = [];
+  queryCount: number = 0;
+  selectedQuery: Query | null = null;
+  queryTitle: string = '';
+
+  // (Other properties remain unchanged)
   filterColumns = [
     {
       name: 'Customer Name',
@@ -128,7 +134,6 @@ export class AppComponent implements OnInit {
     { groupByColumn: '', aggregateFunction: '', aggregateColumn: '' },
   ];
 
-  // For columns/joins/etc.
   selectedColumns: string[] = [];
   newColumnExpression = '';
   newColumnName = '';
@@ -142,32 +147,29 @@ export class AppComponent implements OnInit {
     'Time',
     'Datetime',
   ];
+
   selectedJoinTable = '';
   selectedLeftColumn = '';
   selectedRightColumn = '';
   selectedJoinType = '';
   selectedJoinColumns: string[] = [];
   joinTypes = ['Inner Join', 'Left Join', 'Right Join', 'Full Join'];
+
   selectedTableToAppend: string = '';
   dropDuplicates: string = 'No';
   customExpression: string = '';
 
   @ViewChild('overlay') overlay!: ElementRef;
 
-  // ***** NEW: Queries array & selection *****
-  queries: Query[] = [];
-  queryCount: number = 0; // Separate counter for queries
-  selectedQuery: Query | null = null;
-  queryTitle: string = ''; // Bound to the right panel input
-
+  // API calls
   gettabledata() {
     this.Apidata.GetTableApi().subscribe((res: any) => (this.tables = res));
   }
-
   getcolumndata(table1: string) {
-    this.Apidata.GetColumnApi(table1).subscribe(
-      (res: any) => (this.columns = res)
-    );
+    this.Apidata.GetColumnApi(table1).subscribe((res: any) => {
+      this.columns = res;
+      this.selectedColumns = [];
+    });
   }
   getrightcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe(
@@ -183,7 +185,7 @@ export class AppComponent implements OnInit {
     this.getrightcolumndata(Rtable);
   }
 
-  // ***** Updated Queries Logic *****
+  // Query Methods
   addQueries() {
     this.queryCount++;
     this.queries.push({
@@ -191,12 +193,10 @@ export class AppComponent implements OnInit {
       name: `Query ${this.queryCount}`,
     });
   }
-
   openQuery(query: Query) {
     this.selectedQuery = query;
     this.queryTitle = query.name;
   }
-
   updateSelectedQueryName() {
     if (this.selectedQuery) {
       this.selectedQuery.name = this.queryTitle;
@@ -205,7 +205,7 @@ export class AppComponent implements OnInit {
     this.queryTitle = '';
   }
 
-  // ***** Existing Operations methods remain unchanged *****
+  // Operations Methods (unchanged)
   toggleOverlay(event: Event) {
     this.showOverlay = !this.showOverlay;
     event.stopPropagation();
@@ -216,6 +216,9 @@ export class AppComponent implements OnInit {
   }
   selectTable(table: string) {
     this.selectedTable = table;
+    if (this.selectedQuery) {
+      this.selectedQuery.selectedTable = table;
+    }
     console.log('Selected Table:', this.selectedTable);
     this.getcolumndata(table);
     this.getdata();
@@ -326,8 +329,7 @@ export class AppComponent implements OnInit {
     newDashboardDiv.textContent = `dashboard ${this.dashboardCount}`;
     document.getElementById('dashboardContainer')?.appendChild(newDashboardDiv);
   }
-
-  // (Filter Rows and Grouping methods remain unchanged)
+  // Filter Rows and Grouping methods remain unchanged.
   openFilterRowsOverlay() {
     this.showFilterRowsOverlay = true;
     this.showOverlay = false;
