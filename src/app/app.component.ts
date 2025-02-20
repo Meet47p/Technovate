@@ -202,7 +202,7 @@ export class AppComponent implements OnInit {
       this.selectedQuery.name = this.queryTitle;
     }
     // Clear the input after updating
-    this.queryTitle = '';
+    // this.queryTitle = '';
   }
 
   // Operations Methods (unchanged)
@@ -285,6 +285,10 @@ export class AppComponent implements OnInit {
   openAppendTableOverlay() {
     this.showAppendTableOverlay = true;
     this.showOverlay = false;
+  }
+  deleteQuery(queryId: number): void {
+    this.queries = this.queries.filter((query) => query.id !== queryId);
+    // Optional: Confirm deletion with the user
   }
   confirmAppendTable() {
     console.log('Selected Table to Append:', this.selectedTableToAppend);

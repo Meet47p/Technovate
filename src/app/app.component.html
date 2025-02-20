@@ -23,6 +23,9 @@
               >
                 {{ query.name }}
               </button>
+              <button class="delete-button" (click)="deleteQuery(query.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </div>
           </div>
         </ul>
@@ -84,24 +87,25 @@
           </table>
         </ng-container>
         <ng-template #noTable>
-          <h1>NO QUERY AVAILABLE</h1>
+          <h1 class="default-query-message">No Query Available</h1>
         </ng-template>
       </ng-container>
       <ng-template #noQueryOpen>
-        <h1>Please open a query</h1>
+        <h1 class="default-query-message">Please open a query</h1>
       </ng-template>
     </div>
     <!-- RIGHT PANEL -->
     <div class="right-pannel">
       <div class="detail-box">
         <h4 class="Rdetails">Details</h4>
-        <label for="queryTitle" class="Rqueriestitle">Query Title</label>
+        <!-- <label for="queryTitle" class="Rqueriestitle">Query Title</label> -->
         <input
           type="text"
           class="queriestext"
           [(ngModel)]="queryTitle"
           (keyup.enter)="updateSelectedQueryName()"
           [disabled]="!selectedQuery"
+          placeholder="Enter query title"
         />
       </div>
       <hr />
@@ -281,7 +285,9 @@
         <div *ngIf="selectedTable" class="selected-info">
           <div><strong>Selected Table:</strong> {{ selectedTable }}</div>
           <div>
-            <strong>Selected Columns:</strong>
+            <strong *ngIf="selectedColumns.length > 0"
+              >Selected Columns:</strong
+            >
             <ul>
               <li *ngFor="let col of selectedColumns">{{ col }}</li>
             </ul>

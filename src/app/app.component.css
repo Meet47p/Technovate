@@ -49,8 +49,8 @@
 }
 
 .center::-webkit-scrollbar {
-  width: 6px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
 }
 
 .center::-webkit-scrollbar-thumb {
@@ -102,7 +102,17 @@ hr {
 #adddashboardBtn {
   position: relative;
   top: -26px;
-  left: 146px;
+  left: 190px;
+  border: 0.5px solid black;
+  border-radius: 8px;
+  /* visibility: hidden; */
+}
+
+#addQueryBtn:hover,
+#addchartBtn:hover,
+#adddashboardBtn:hover {
+  /* border: none; */
+  visibility: visible;
 }
 
 #queryContainer,
@@ -564,6 +574,23 @@ label {
 }
 
 /* NEW: Improved Left Panel Query Styles */
+
+.queryItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  /* border-bottom: 1px solid #ccc; */
+}
+
+.delete-button {
+  width: 45px;
+  height: 20px;
+  margin-top: 2px;
+  padding: 0px;
+  border: none !important;
+  /* visibility: hidden; */
+}
+
 .queryItem button.query-button {
   background: none;
   border: none;
@@ -582,7 +609,7 @@ label {
 }
 
 .queryItem button.query-button.selected-query {
-  background-color: #e8e8e8;
+  /* background-color: #e8e8e8; */
   font-weight: 600;
   color: #000;
 }
@@ -599,4 +626,18 @@ label {
   color: #999;
   cursor: not-allowed;
   border-color: #ccc;
+}
+
+.default-query-message {
+  padding: 0px 301.3px;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 30px;
+  color: #333;
+  /* border-bottom: 1px solid #ccc; */
+}
+
+.queriestext {
+  text-align: center;
+  padding: 2px;
+  margin-right: 2px;
 }
