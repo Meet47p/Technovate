@@ -47,34 +47,16 @@
   flex-direction: column; /* Align children in a column */
   align-items: flex-start; /* Align content to the top */
   flex-grow: 1; /* Take up remaining space */
-  margin: 6px;
-  /* align-items: center; */
-}
-table {
-  border-collapse: collapse;
-  width: 100%;
-  white-space: nowrap;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ccc;
 }
 
-th,
-td {
-  padding: 8px;
-  text-align: center;
-  border: 1px solid #ccc;
-}
-
-/* Ensure no large margins or paddings causing overflow */
 ul {
   list-style: none;
 }
 
 hr {
   border: none;
-  height: 0.9px;
-  background-color: #ccc;
+  height: 0.5px;
+  background-color: grey;
 }
 
 .queriestitle,
@@ -114,13 +96,13 @@ button {
 
 .overlay {
   position: absolute;
-  left: -405px;
-  top: 35px;
+  left: -260px;
+  top: 6px;
   background: white;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
   padding: 5px;
-  width: 400px;
+  width: 250px;
   border-radius: 5px;
   margin: 0;
 }
@@ -139,7 +121,6 @@ button {
   align-items: center;
   padding: 8px;
   cursor: pointer;
-  /* border-bottom: 1px solid #ccc; */
   border-radius: 4px;
   background: #fff;
 }
@@ -171,7 +152,8 @@ button {
 .join-table-overlay,
 .append-table-overlay,
 .custom-oper-overlay,
-.filter-row-overlay {
+.filter-row-overlay,
+.gas-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -201,9 +183,9 @@ button {
   padding: 0;
   margin: 6px;
   max-height: 200px; /* Adjust height as needed */
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: hidden; /* Prevents horizontal scrolling */
-  border: 1px solid #ccc; /* Optional: Adds a border for better visibility */
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid #ccc;
 }
 
 .table-overlay ul li,
@@ -229,6 +211,14 @@ input[type="checkbox"] {
   margin: 10px 0 5px;
 }
 
+.add-column-content select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
 .add-column-content textarea,
 .add-column-content input,
 .add-column-content select {
@@ -237,6 +227,23 @@ input[type="checkbox"] {
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
+}
+
+.add-column-content input {
+  width: 280px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.add-column-content textarea {
+  width: 280px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
 }
 
 .add-column-content .buttons {
@@ -340,13 +347,20 @@ input[type="checkbox"] {
 }
 
 .custom-oper-overlay textarea {
+  width: 278px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  resize: vertical;
   width: 100%;
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-bottom: 15px;
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
 }
 
 .custom-oper-actions {
@@ -385,18 +399,15 @@ input[type="checkbox"] {
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
   margin-top: 10px;
 }
-
 .selected-info strong {
   font-size: 16px;
   color: #333;
 }
-
 .selected-info ul {
   list-style-type: none;
   padding: 0;
   margin: 5px 0 0 0;
 }
-
 .selected-info li {
   background: #ffffff;
   padding: 8px;
@@ -407,7 +418,6 @@ input[type="checkbox"] {
 .filter-row-main {
   display: flex;
 }
-
 .filter-row-overlay-content {
   background-color: white;
   padding: 20px;
@@ -415,16 +425,13 @@ input[type="checkbox"] {
   width: 500px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .filter-row-overlay h4 {
   text-align: center;
   margin-bottom: 15px;
 }
-
 .filter-row-overlay span {
   margin-right: 1px;
 }
-
 .filter-row-overlay select {
   width: 30%;
   padding: 0px;
@@ -432,7 +439,6 @@ input[type="checkbox"] {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 .filter-row-add-btn {
   padding: 8px;
   cursor: pointer;
@@ -440,31 +446,86 @@ input[type="checkbox"] {
   margin-top: 5px;
   margin-bottom: 10px;
 }
-
 .filter-row-remove-btn {
   padding: 5px 8px;
   cursor: pointer;
   border-radius: 4px;
   margin-left: 5px;
 }
-
 .filter-row-actions {
   display: flex;
   justify-content: space-between;
 }
-
 .filter-row-actions button {
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 4px;
 }
+.gas-overlay-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 450px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+.gas-overlay-content::-webkit-scrollbar {
+  width: 6px;
+}
+.gas-overlay-content::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 3px;
+}
+.gas-overlay-content::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+.gas-overlay h4 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+.gas-grouping-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+label {
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+.gas-overlay select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.gas-add-btn {
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+.gas-remove-btn {
+  padding: 4px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+.gas-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.gas-actions button {
+  padding: 4px 7px;
+  cursor: pointer;
+  border-radius: 4px;
+}
 
-/* i {
-    width: 20px;
-    text-align: center;
-  } */
-
-/* 1. Make query items look like plain text with hover. */
+/* NEW: Improved Left Panel Query Styles */
 .queryItem button.query-button {
   background: none;
   border: none;
@@ -478,19 +539,17 @@ input[type="checkbox"] {
   transition: background-color 0.2s, color 0.2s;
 }
 
-/* Hover effect: slightly darker background */
 .queryItem button.query-button:hover {
   background-color: #f2f2f2;
 }
 
-/* Optional highlight for the currently selected query */
 .queryItem button.query-button.selected-query {
   background-color: #e8e8e8;
   font-weight: 600;
   color: #000;
 }
 
-/* 2. Better disabled styling for the right panel input/button */
+/* NEW: Improved Disabled Styles for Right Panel */
 .queriestext:disabled {
   background-color: #f7f7f7;
   color: #999;

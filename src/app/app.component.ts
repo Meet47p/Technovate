@@ -3,32 +3,33 @@ import {
   Component,
   ElementRef,
   HostListener,
+  inject,
   OnInit,
   ViewChild,
-  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './Services/api.service';
 import { HeaderComponent } from './components/header/header.component';
 
-/** Model for each Query */
 interface Query {
   id: number;
   name: string;
-  selectedTable?: string; // Which table is chosen
-  columns?: string[]; // Columns from that table
-  tableData?: any[]; // Data from that table
+  selectedTable?: string;
+  columns?: string[];
+  tableData?: any[];
 }
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [CommonModule, FormsModule, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  // Basic
+  ngOnInit(): void {
+    this.gettabledata();
+    // this.getcolumndata();
+  }
   title = 'DynamicDahboard';
 
   // Overlays
@@ -39,23 +40,96 @@ export class AppComponent implements OnInit {
   showJoinTableOverlay = false;
   showAppendTableOverlay = false;
   showCustomOperationOverlay = false;
+  showFilterRowsOverlay = false;
+  showGroupSummarizeOverlay = false;
 
-  // Queries
-  queries: Query[] = [];
-  queryCount = 0;
-  selectedQuery: Query | null = null; // The query that's currently "opened"
+  // API data and existing properties
+  Apidata = inject(ApiService);
+  tables = []; // stores table API data.
+  selectedTable: string = '';
+  columns = []; // stores Column API data.
+  rightcolumns = [];
+  tabledata = []; // stores data of selected
 
-  // Input for renaming the query
-  queryTitle: string = '';
+  // (Other properties for filters, join, grouping, etc. remain intact)
+  filterColumns = [
+    {
+      name: 'Customer Name',
+      type: 'string',
+      values: ['Alice', 'Bob', 'Charlie'],
+    },
+    {
+      name: 'Order Date',
+      type: 'DateTime',
+      values: ['2024-01-01', '2024-01-15', '2024-02-01'],
+    },
+    { name: 'Quantity', type: 'integer', values: [1, 2, 5, 10] },
+    { name: 'Price', type: 'decimal', values: [10.99, 20.5, 100.75] },
+  ];
+  operations: any = {
+    string: [
+      'is',
+      'is not',
+      'contains',
+      'does not contain',
+      'starts with',
+      'ends with',
+      'is set',
+      'is not set',
+    ],
+    DateTime: [
+      'equals',
+      'not equals',
+      'greater than',
+      'greater than or equals',
+      'less than',
+      'less than or equals',
+      'between',
+      'within',
+    ],
+    integer: [
+      'equals',
+      'not equals',
+      'greater than',
+      'greater than or equals',
+      'less than',
+      'less than or equals',
+      'between',
+    ],
+    decimal: [
+      'equals',
+      'not equals',
+      'greater than',
+      'greater than or equals',
+      'less than',
+      'less than or equals',
+      'between',
+    ],
+  };
+  filters: any = [
+    {
+      column: '',
+      operation: '',
+      value: '',
+      availableOperations: [],
+      availableValues: [],
+      condition: 'AND',
+    },
+  ];
+  aggregateFunctions = [
+    'Count of',
+    'Sum of',
+    'Average of',
+    'Minimum of',
+    'Maximum of',
+    'Unique count of',
+  ];
+  groupings = [
+    { groupByColumn: '', aggregateFunction: '', aggregateColumn: '' },
+  ];
 
-  // Tables from API (for "Select Source")
-  tables: string[] = [];
-  rightcolumns: string[] = []; // For Join Table overlay
-
-  // For "Choose Columns" overlay
+  // For columns/joins/etc.
   selectedColumns: string[] = [];
-
-  // For "Add New Column" overlay
   newColumnExpression = '';
   newColumnName = '';
   newColumnType = '';
@@ -68,42 +142,48 @@ export class AppComponent implements OnInit {
     'Time',
     'Datetime',
   ];
-
-  // For "Join Table" overlay
   selectedJoinTable = '';
   selectedLeftColumn = '';
   selectedRightColumn = '';
   selectedJoinType = '';
   selectedJoinColumns: string[] = [];
   joinTypes = ['Inner Join', 'Left Join', 'Right Join', 'Full Join'];
-
-  // For "Append Table"
   selectedTableToAppend: string = '';
   dropDuplicates: string = 'No';
-
-  // For "Custom Operation"
   customExpression: string = '';
 
-  // Charts & Dashboard counters
-  chartsCount = 0;
-  dashboardCount = 0;
-
-  // Overlay reference
   @ViewChild('overlay') overlay!: ElementRef;
 
-  // Injecting our API service
-  Apidata = inject(ApiService);
+  // ***** NEW: Queries array & selection *****
+  queries: Query[] = [];
+  queryCount: number = 0; // Separate counter for queries
+  selectedQuery: Query | null = null;
+  queryTitle: string = ''; // Bound to the right panel input
 
-  ngOnInit(): void {
-    // Fetch available tables on init
-    this.Apidata.GetTableApi().subscribe((res: any) => {
-      this.tables = res;
-    });
+  gettabledata() {
+    this.Apidata.GetTableApi().subscribe((res: any) => (this.tables = res));
   }
 
-  /*=======================================
-   *            QUERIES LOGIC
-   =======================================*/
+  getcolumndata(table1: string) {
+    this.Apidata.GetColumnApi(table1).subscribe(
+      (res: any) => (this.columns = res)
+    );
+  }
+  getrightcolumndata(table1: string) {
+    this.Apidata.GetColumnApi(table1).subscribe(
+      (res: any) => (this.rightcolumns = res)
+    );
+  }
+  getdata() {
+    this.Apidata.GetData(this.selectedTable).subscribe((res: any) => {
+      this.tabledata = res;
+    });
+  }
+  RightTable(Rtable: string) {
+    this.getrightcolumndata(Rtable);
+  }
+
+  // ***** Updated Queries Logic *****
   addQueries() {
     this.queryCount++;
     this.queries.push({
@@ -112,81 +192,42 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // Open (activate) a query
   openQuery(query: Query) {
     this.selectedQuery = query;
-    // Populate the Query Title input
     this.queryTitle = query.name;
   }
 
-  // Rename the opened query after pressing Enter
   updateSelectedQueryName() {
     if (this.selectedQuery) {
       this.selectedQuery.name = this.queryTitle;
     }
-    // If you want to clear the input after renaming:
+    // Clear the input after updating
     this.queryTitle = '';
   }
 
-  /*=======================================
-   *           SELECT SOURCE
-   *  (For the currently opened query)
-   =======================================*/
-  selectSourceTable(table: string) {
-    if (!this.selectedQuery) {
-      alert('Please open a query first.');
-      return;
-    }
-    // Set the table on the current query
-    this.selectedQuery.selectedTable = table;
-
-    // Fetch columns
-    this.Apidata.GetColumnApi(table).subscribe((res: any) => {
-      this.selectedQuery!.columns = res;
-    });
-
-    // Fetch table data
-    this.Apidata.GetData(table).subscribe((res: any) => {
-      this.selectedQuery!.tableData = res;
-    });
-
-    // Close the overlay
-    this.showTableOverlay = false;
-  }
-
-  /*=======================================
-   *           ADD OPERATIONS
-   =======================================*/
-  // Show/hide the small "Add Operations" overlay
+  // ***** Existing Operations methods remain unchanged *****
   toggleOverlay(event: Event) {
-    if (!this.selectedQuery) {
-      alert('Please open a query first.');
-      return;
-    }
     this.showOverlay = !this.showOverlay;
     event.stopPropagation();
   }
-
-  // "Select Source" overlay
   openTableOverlay() {
     this.showTableOverlay = true;
     this.showOverlay = false;
   }
-
+  selectTable(table: string) {
+    this.selectedTable = table;
+    console.log('Selected Table:', this.selectedTable);
+    this.getcolumndata(table);
+    this.getdata();
+    this.showTableOverlay = false;
+  }
   closeTableOverlay() {
     this.showTableOverlay = false;
   }
-
-  // "Choose Columns" overlay
   openColumnOverlay() {
-    if (!this.selectedQuery?.columns) {
-      alert('Please select a source table first.');
-      return;
-    }
     this.showColumnOverlay = true;
     this.showOverlay = false;
   }
-
   toggleColumnSelection(column: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
@@ -199,22 +240,17 @@ export class AppComponent implements OnInit {
       );
     }
   }
-
   confirmColumnSelection() {
     console.log('Selected Columns:', this.selectedColumns);
     this.showColumnOverlay = false;
   }
-
   closeColumnOverlay() {
     this.showColumnOverlay = false;
   }
-
-  // "Add New Column" overlay
   openAddColumnOverlay() {
     this.showAddColumnOverlay = true;
     this.showOverlay = false;
   }
-
   confirmAddColumn() {
     console.log('New Column Details:', {
       Expression: this.newColumnExpression,
@@ -223,24 +259,13 @@ export class AppComponent implements OnInit {
     });
     this.showAddColumnOverlay = false;
   }
-
   closeAddColumnOverlay() {
     this.showAddColumnOverlay = false;
   }
-
-  // "Join Table" overlay
   openJoinTableOverlay() {
     this.showJoinTableOverlay = true;
     this.showOverlay = false;
   }
-
-  RightTable(tableName: string) {
-    // Load columns for the chosen right table
-    this.Apidata.GetColumnApi(tableName).subscribe((res: any) => {
-      this.rightcolumns = res;
-    });
-  }
-
   confirmJoinTable() {
     console.log('Join Table Details:', {
       JoinTable: this.selectedJoinTable,
@@ -251,43 +276,32 @@ export class AppComponent implements OnInit {
     });
     this.showJoinTableOverlay = false;
   }
-
   closeJoinTableOverlay() {
     this.showJoinTableOverlay = false;
   }
-
-  // "Append Table" overlay
   openAppendTableOverlay() {
     this.showAppendTableOverlay = true;
     this.showOverlay = false;
   }
-
   confirmAppendTable() {
     console.log('Selected Table to Append:', this.selectedTableToAppend);
     console.log('Drop Duplicates:', this.dropDuplicates);
     this.closeAppendTableOverlay();
   }
-
   closeAppendTableOverlay() {
     this.showAppendTableOverlay = false;
   }
-
-  // "Custom Operation" overlay
   openCustomOperationOverlay() {
     this.showCustomOperationOverlay = true;
     this.showOverlay = false;
   }
-
   confirmCustomOperation() {
     console.log('Custom Expression:', this.customExpression);
     this.closeCustomOperationOverlay();
   }
-
   closeCustomOperationOverlay() {
     this.showCustomOperationOverlay = false;
   }
-
-  // Close the small overlay if the user clicks outside
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
     if (
@@ -298,22 +312,101 @@ export class AppComponent implements OnInit {
       this.showOverlay = false;
     }
   }
-
-  /*=======================================
-   *      CHARTS & DASHBOARD
-   * (Direct DOM approach as in your code)
-   =======================================*/
+  chartsCount: number = 0;
+  dashboardCount: number = 0;
   addCharts() {
     this.chartsCount++;
     const newChartDiv = document.createElement('div');
     newChartDiv.textContent = `charts ${this.chartsCount}`;
     document.getElementById('chartsContainer')?.appendChild(newChartDiv);
   }
-
   addDashboard() {
     this.dashboardCount++;
     const newDashboardDiv = document.createElement('div');
     newDashboardDiv.textContent = `dashboard ${this.dashboardCount}`;
     document.getElementById('dashboardContainer')?.appendChild(newDashboardDiv);
+  }
+
+  // (Filter Rows and Grouping methods remain unchanged)
+  openFilterRowsOverlay() {
+    this.showFilterRowsOverlay = true;
+    this.showOverlay = false;
+  }
+  closeFilterRowsOverlay() {
+    this.showFilterRowsOverlay = false;
+  }
+  addFilter() {
+    this.filters.push({
+      column: '',
+      operation: '',
+      value: '',
+      availableOperations: [],
+      availableValues: [],
+      condition: 'AND',
+    });
+  }
+  removeFilter(index: number) {
+    this.filters.splice(index, 1);
+  }
+  updateOperations(index: number) {
+    const selectedColumn = this.filterColumns.find(
+      (col) => col.name === this.filters[index].column
+    );
+    if (selectedColumn) {
+      this.filters[index].availableOperations =
+        this.operations[selectedColumn.type] || [];
+      this.filters[index].operation = '';
+      this.filters[index].availableValues = selectedColumn.values;
+    }
+  }
+  updateValues(index: number) {
+    const selectedColumn = this.filterColumns.find(
+      (col) => col.name === this.filters[index].column
+    );
+    if (selectedColumn) {
+      this.filters[index].availableValues = selectedColumn.values;
+    }
+  }
+  clearFilters() {
+    this.filters = [
+      {
+        column: '',
+        operation: '',
+        value: '',
+        availableOperations: [],
+        availableValues: [],
+        condition: 'AND',
+      },
+    ];
+  }
+  applyFilters() {
+    console.log('Applied Filters:', this.filters);
+    this.closeFilterRowsOverlay();
+  }
+  openGroupSummarizeOverlay() {
+    this.showGroupSummarizeOverlay = true;
+    this.showOverlay = false;
+  }
+  closeGroupSummarizeOverlay() {
+    this.showGroupSummarizeOverlay = false;
+  }
+  addGrouping() {
+    this.groupings.push({
+      groupByColumn: '',
+      aggregateFunction: '',
+      aggregateColumn: '',
+    });
+  }
+  removeGrouping(index: number) {
+    this.groupings.splice(index, 1);
+  }
+  clearGroupings() {
+    this.groupings = [
+      { groupByColumn: '', aggregateFunction: '', aggregateColumn: '' },
+    ];
+  }
+  applyGroupings() {
+    console.log('Applied Groupings:', this.groupings);
+    this.closeGroupSummarizeOverlay();
   }
 }
