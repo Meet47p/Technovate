@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
   selectedQuery: Query | null = null;
   queryTitle: string = '';
 
-  // (Other properties remain unchanged)
+  // (Other propertiFes remain unchanged)
   filterColumns = [
     {
       name: 'Customer Name',

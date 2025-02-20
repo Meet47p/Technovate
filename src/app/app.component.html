@@ -3,6 +3,11 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto&family=Open+Sans&display=swap"
+    rel="stylesheet"
+  />
+
   <app-header></app-header>
   <div class="container">
     <!-- LEFT PANEL -->
@@ -283,14 +288,23 @@
           </div>
         </div>
         <div *ngIf="selectedTable" class="selected-info">
-          <div><strong>Selected Table:</strong> {{ selectedTable }}</div>
           <div>
-            <strong *ngIf="selectedColumns.length > 0"
-              >Selected Columns:</strong
-            >
-            <ul>
-              <li *ngFor="let col of selectedColumns">{{ col }}</li>
-            </ul>
+            <p>
+              <i class="fa-solid fa-database opIcons"></i>Select
+              <span class="highlightValues">{{ selectedTable }}</span> Table
+            </p>
+          </div>
+          <div *ngIf="selectedColumns.length > 0">
+            <div>
+              <i class="fa-solid fa-table-columns opIcons"></i>
+              Selected
+              <span class="highlightValues">
+                {{ selectedColumns.length }} Columns</span
+              >
+              <!-- <ul>
+                <li *ngFor="let col of selectedColumns">{{ col }}</li>
+              </ul> -->
+            </div>
           </div>
         </div>
         <!-- Filter Rows Overlay -->
