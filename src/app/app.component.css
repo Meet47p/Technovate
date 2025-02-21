@@ -71,13 +71,12 @@ table {
   border: 1px solid #ccc;
 }
 
-
 td {
   padding: 8px;
   text-align: center;
   border: 1px solid #ccc;
 }
-th{
+th {
   padding: 8px;
   position: sticky;
   top: 0;
@@ -603,7 +602,7 @@ label {
   height: 20px;
   margin-top: 2px;
   padding: 0px;
-  left: 1.2%;
+  left: 0%;
   border: none !important;
   /* visibility: hidden; */
 }

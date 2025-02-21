@@ -1,11 +1,10 @@
+/* header.component.css */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: white;
-  /* padding: 10px; */
   margin: 5px 20px;
-  /* border-bottom: 1px solid #ccc; */
   text-align: center;
 }
 
@@ -13,13 +12,240 @@
   border-bottom: 1px solid #ccc;
 }
 
+.user-button {
+  border: none;
+  background: none;
+  padding: 8px;
+  cursor: pointer;
+}
+
 .userIcon {
   font-size: 30px;
   color: #000;
-  margin-right: 20px;
 }
 
-.userIcon:hover {
+.user-button:hover .userIcon {
   color: #007bff;
+}
+
+/* Auth Overlay Styles */
+.auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.auth-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.auth-header i {
+  font-size: 3rem;
+  color: #007bff;
+  margin-bottom: 1rem;
+}
+
+.auth-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
   cursor: pointer;
+}
+
+.close-button:hover {
+  color: #007bff;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0.5rem;
+}
+
+.input-group:focus-within {
+  border-color: #007bff;
+}
+
+.input-group i {
+  color: #666;
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.2s;
+}
+
+.auth-button:hover {
+  background-color: #0056b3;
+}
+
+.auth-button i {
+  font-size: 1.1rem;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+  color: #666;
+}
+
+.auth-switch a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* Add to your existing CSS */
+.message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.user-section {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  margin-top: 10px;
+  z-index: 1000;
+}
+
+.dropdown-header {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-header i {
+  font-size: 20px;
+  color: #007bff;
+}
+
+.dropdown-header span {
+  font-weight: 500;
+  color: #333;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 5px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+  text-align: left;
+}
+
+.dropdown-item i {
+  width: 20px;
+  color: #666;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item:last-child {
+  color: #dc3545;
+}
+
+.dropdown-item:last-child i {
+  color: #dc3545;
+}
+
+/* Make sure clicking outside closes the dropdown */
+.header-container {
+  position: relative;
 }
