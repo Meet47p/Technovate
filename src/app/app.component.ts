@@ -1,3 +1,4 @@
+import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -10,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './Services/api.service';
 import { HeaderComponent } from './components/header/header.component';
+import { LoginComponent } from './components/login/login.component';
 
 // Extend the Query interface
 interface Query {
@@ -20,9 +22,16 @@ interface Query {
   tableData?: any[];
 }
 
+// User Interface
+interface User {
+  email: string;
+  password: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, LoginComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
@@ -56,6 +65,10 @@ export class AppComponent implements OnInit {
   queryCount: number = 0;
   selectedQuery: Query | null = null;
   queryTitle: string = '';
+
+  //Login Management
+  isLoggedIn: boolean = false;
+  currentUser: User | null = null;
 
   // (Other propertiFes remain unchanged)
   filterColumns = [
@@ -414,5 +427,15 @@ export class AppComponent implements OnInit {
   applyGroupings() {
     console.log('Applied Groupings:', this.groupings);
     this.closeGroupSummarizeOverlay();
+  }
+
+  onLoginSuccess(user: User) {
+    this.currentUser = user;
+    this.isLoggedIn = true;
+  }
+
+  onLogout() {
+    this.isLoggedIn = false;
+    this.currentUser = null;
   }
 }

@@ -1,0 +1,113 @@
+<!-- login.component.html -->
+<div class="auth-overlay">
+  <div class="auth-box">
+    <!-- Login Form -->
+    <ng-container *ngIf="showLoginForm">
+      <div class="auth-header">
+        <i class="fa-solid fa-user-circle"></i>
+        <h2>Login</h2>
+      </div>
+      <div class="auth-form">
+        <div
+          class="message"
+          *ngIf="loginMessage.text"
+          [ngClass]="loginMessage.type"
+        >
+          {{ loginMessage.text }}
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input
+              type="email"
+              placeholder="Email"
+              [(ngModel)]="loginEmail"
+              name="loginEmail"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              placeholder="Password"
+              [(ngModel)]="loginPassword"
+              name="loginPassword"
+            />
+          </div>
+        </div>
+        <button class="auth-button" (click)="onLogin()">
+          <i class="fa-solid fa-sign-in-alt"></i>
+          Login
+        </button>
+        <p class="auth-switch">
+          Don't have an account?
+          <a href="#" (click)="toggleSignupForm(); $event.preventDefault()"
+            >Sign up</a
+          >
+        </p>
+      </div>
+    </ng-container>
+
+    <!-- Signup Form -->
+    <ng-container *ngIf="showSignupForm">
+      <div class="auth-header">
+        <i class="fa-solid fa-user-plus"></i>
+        <h2>Sign Up</h2>
+      </div>
+      <div class="auth-form">
+        <div
+          class="message"
+          *ngIf="signupMessage.text"
+          [ngClass]="signupMessage.type"
+        >
+          {{ signupMessage.text }}
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input
+              type="text"
+              placeholder="Full Name"
+              [(ngModel)]="signupName"
+              name="signupName"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input
+              type="email"
+              placeholder="Email"
+              [(ngModel)]="signupEmail"
+              name="signupEmail"
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              placeholder="Password"
+              [(ngModel)]="signupPassword"
+              name="signupPassword"
+            />
+          </div>
+        </div>
+        <button class="auth-button" (click)="onSignup()">
+          <i class="fa-solid fa-user-plus"></i>
+          Sign Up
+        </button>
+        <p class="auth-switch">
+          Already have an account?
+          <a href="#" (click)="toggleLoginForm(); $event.preventDefault()"
+            >Login</a
+          >
+        </p>
+      </div>
+    </ng-container>
+  </div>
+</div>
