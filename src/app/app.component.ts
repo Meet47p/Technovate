@@ -181,6 +181,7 @@ export class AppComponent implements OnInit {
       this.tabledata = res;
     });
   }
+
   RightTable(Rtable: string) {
     this.getrightcolumndata(Rtable);
   }
