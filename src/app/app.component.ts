@@ -160,10 +160,11 @@ export class AppComponent implements OnInit {
   customExpression: string = '';
 
   @ViewChild('overlay') overlay!: ElementRef;
+  payload: [] =[]
 
   // API calls
   gettabledata() {
-    this.Apidata.GetTableApi().subscribe((res: any) => (this.tables = res));
+    this.Apidata.GetTableApi(this.payload).subscribe((res: any) => (this.tables = res));
   }
   getcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe((res: any) => {

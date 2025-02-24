@@ -15,9 +15,10 @@
       <div class="left">
         <ul>
           <li>
-            <h4 class="queriestitle">Queries</h4>
+            <h6 class="queriestitle">Queries</h6>
             <button id="addQueryBtn" (click)="addQueries()">+</button>
           </li>
+        </ul>
           <div id="queryContainer">
             <!-- Render queries as plain text with hover and selection styling -->
             <div *ngFor="let query of queries" class="queryItem">
@@ -25,7 +26,7 @@
                 class="query-button"
                 (click)="openQuery(query)"
                 [ngClass]="{ 'selected-query': selectedQuery?.id === query.id }"
-              >
+              ><i class="fa-solid fa-table-list queryopIcons"></i>
                 {{ query.name }}
               </button>
               <button class="delete-button" (click)="deleteQuery(query.id)">
@@ -33,7 +34,7 @@
               </button>
             </div>
           </div>
-        </ul>
+        
       </div>
       <hr />
       <div>
@@ -57,21 +58,24 @@
           <div id="dashboardContainer"></div>
         </ul>
       </div>
+      <hr>
     </div>
     <!-- CENTER PANEL -->
     <div class="center">
       <ng-container *ngIf="selectedQuery; else noQueryOpen">
         <ng-container *ngIf="selectedQuery.selectedTable; else noTable">
-          <table border="2">
-            <thead>
-              <tr>
-                <th
+          <div class="table-container">
+
+            <table border="2">
+              <thead>
+                <tr>
+                  <th
                   *ngFor="
-                    let column of selectedColumns.length
-                      ? selectedColumns
-                      : columns
+                  let column of selectedColumns.length
+                  ? selectedColumns
+                  : columns
                   "
-                >
+                  >
                   {{ column }}
                 </th>
               </tr>
@@ -79,17 +83,18 @@
             <tbody>
               <tr *ngFor="let row of tabledata">
                 <td
-                  *ngFor="
-                    let column of selectedColumns.length
-                      ? selectedColumns
-                      : columns
-                  "
+                *ngFor="
+                let column of selectedColumns.length
+                ? selectedColumns
+                : columns
+                "
                 >
-                  {{ row[column] }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                {{ row[column] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
         </ng-container>
         <ng-template #noTable>
           <h1 class="default-query-message">No Query Available</h1>
@@ -103,7 +108,7 @@
     <div class="right-pannel">
       <div class="detail-box">
         <h4 class="Rdetails">Details</h4>
-        <!-- <label for="queryTitle" class="Rqueriestitle">Query Title</label> -->
+        <label for="queryTitle" class="Rqueriestitle">Query Title</label>
         <input
           type="text"
           class="queriestext"
@@ -287,26 +292,7 @@
             </div>
           </div>
         </div>
-        <div *ngIf="selectedTable" class="selected-info">
-          <div>
-            <p>
-              <i class="fa-solid fa-database opIcons"></i>Select
-              <span class="highlightValues">{{ selectedTable }}</span> Table
-            </p>
-          </div>
-          <div *ngIf="selectedColumns.length > 0">
-            <div>
-              <i class="fa-solid fa-table-columns opIcons"></i>
-              Selected
-              <span class="highlightValues">
-                {{ selectedColumns.length }} Columns</span
-              >
-              <!-- <ul>
-                <li *ngFor="let col of selectedColumns">{{ col }}</li>
-              </ul> -->
-            </div>
-          </div>
-        </div>
+        
         <!-- Filter Rows Overlay -->
         <div class="filter-row-overlay" *ngIf="showFilterRowsOverlay">
           <div class="filter-row-overlay-content">
@@ -455,6 +441,24 @@
         <ng-template #noQueryOpen>
           <h1>Please open a query</h1>
         </ng-template>
+
+        <div *ngIf="selectedTable" class="selected-info">
+          <div>
+            <p>
+              <i class="fa-solid fa-database opIcons"></i>Select
+              <span class="highlightValues">{{ selectedTable }}</span> Table
+            </p>
+          </div>
+          <div *ngIf="selectedColumns.length > 0">
+            <div>
+              <i class="fa-solid fa-table-columns opIcons"></i>
+              Selected
+              <span class="highlightValues">
+                {{ selectedColumns.length }} Columns</span
+              >
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
