@@ -438,6 +438,59 @@
           </div>
         </div>
       </div>
+
+      <div class="vertical-line" *ngIf="selectedTable"></div>
+
+      <div *ngIf="selectedTable">
+        <div class="selected-table-div">
+          <p>
+            <i class="fa-solid fa-database opIcons"></i>Select
+            <span class="highlightValues" (click)="editTable()">{{
+              selectedTable
+            }}</span>
+          </p>
+        </div>
+        <div class="vertical-line1" *ngIf="selectedColumns.length > 0"></div>
+        <div *ngIf="selectedColumns.length > 0">
+          <div class="selected-columns-div">
+            <i class="fa-solid fa-table-columns opIcons"></i>
+            Selected
+            <span class="highlightValues" (click)="editColumns()">
+              {{ selectedColumns.length }} Columns</span
+            >
+            <!-- <ul>
+              <li *ngFor="let col of selectedColumns">{{ col }}</li>
+            </ul> -->
+          </div>
+          <div class="vertical-line1" *ngIf="selectedJoinType.length > 0"></div>
+          <div>
+            <div class="selected-join-div">
+              <p>
+                <i class="fa-solid fa-circle-half-stroke"></i>
+                <span class="highlightValues">{{ selectedJoinType }}</span
+                >join <span class="highlightValues">{{ Rtable }}</span> table
+              </p>
+            </div>
+            <div
+              class="vertical-line2"
+              *ngIf="selectedColumns.length > 0"
+            ></div>
+            <div>
+              <div class="selected-filter-div">
+                <p>
+                  <i class="fa-solid fa-filter"></i>Filter
+                  <span
+                    class="highlightValues"
+                    *ngFor="let col of selectedColumns"
+                  >
+                    {{ col }}</span
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </ng-container>

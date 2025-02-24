@@ -10,6 +10,7 @@
   flex-direction: column;
   height: 100vh;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 /* Ensure .container flexbox is well-defined */
@@ -121,6 +122,12 @@ hr {
   border-radius: 8px;
   /* visibility: hidden; */
 }
+#addQueryBtn:hover,
+#addchartBtn:hover,
+#adddashboardBtn:hover {
+  background-color:#ccc;
+  transition: background-color 0.3s ease-in-out;
+} 
 
 #addQueryBtn:hover,
 #addchartBtn:hover,
@@ -408,7 +415,8 @@ input[type="checkbox"] {
 /* Right Panel Specific Styles */
 .queriestext {
   border-radius: 6px;
-  border-color: black;
+  border: height 0.3px; 
+  border-color: #ccc;
   margin-left: 6px;
   padding: 1px;
 }
@@ -416,6 +424,10 @@ input[type="checkbox"] {
 .addOperations {
   margin: 4px;
   border-radius: 10px;
+}
+.addOperations:hover {
+ background: whitesmoke;
+  border: 1px solid #ccc;
 }
 
 .Rqueriestitle {
@@ -436,6 +448,55 @@ input[type="checkbox"] {
   margin-top: 10px;
 }
 
+.vertical-line {
+  width: 1.5px;
+  height: 16px;
+  background-color: black;
+  display: inline-block;
+  position: relative;
+  left: 22px;
+  border-left: 1px solid black;
+}
+.selected-table-div{
+  position: relative;
+  left: 17px;
+  top: -14px;
+}
+.vertical-line1 {
+  width: 1.5px;
+  height: 16px;
+  background-color: black;
+  display: inline-block;
+  position: relative;
+  left: 22px;
+  border-left: 1px solid black;
+  top: -29px;
+}
+.selected-columns-div{
+  position: relative;
+  left: 18px;
+  top: -31px;
+}
+.selected-join-div{
+  position: relative;
+  left: 20px;
+  top: -47px;
+}
+.vertical-line2{
+  width: 1.5px;
+  height: 16px;
+  background-color: black;
+  display: inline-block;
+  position: relative;
+  left: 22px;
+  border-left: 1px solid black;
+  top: -58px;
+}
+.selected-filter-div{
+  position: relative;
+  left: 20px;
+  top: -74px;
+}
 .selected-info strong {
   font-size: 16px;
   color: #333;
@@ -594,17 +655,28 @@ label {
   /* justify-content: space-between; */
   padding: 8px;
   /* border-bottom: 1px solid #ccc; */
+  width: 214px;
+  height: 34px;
+}
+.queryItem:hover {
+  border-radius: 5px;
+  /* background-color: #f2f2f2; */
 }
 
 .delete-button {
   position: relative;
   width: 45px;
-  height: 20px;
+  height: 32px;
   margin-top: 2px;
   padding: 0px;
   left: 0%;
   border: none !important;
+  top: -2px;
   /* visibility: hidden; */
+}
+.delete-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
 }
 
 .queryItem button.query-button {
@@ -645,11 +717,27 @@ label {
 }
 
 .default-query-message {
-  padding: 0px 301.3px;
+  padding: 0px;
   font-family: "IBM Plex Sans", sans-serif;
-  font-size: 30px;
+  font-size: 2rem; /* Scales better than fixed px values */
   color: #333;
-  /* border-bottom: 1px solid #ccc; */
+  position: relative;
+  text-align: center; /* Center text on smaller screens */
+  margin: 20px auto; /* Center horizontally */
+  
+  /* Responsive positioning */
+  top: 10px;
+  left: 0;
+  max-width: 90%; /* Prevent overflow on smaller screens */
+  width: fit-content;
+
+  /* Smooth scaling on hover */
+  transition: transform 0.3s ease-in-out;
+}
+
+.default-query-message:hover {
+  cursor: pointer;
+  transform: scale(1.1);
 }
 
 .queriestext {
@@ -672,48 +760,42 @@ label {
 }
 
 .highlightValues {
-  /* w-fit */
-  width: fit-content;
+  width: fit-content; /* Allows text to shrink or expand naturally */
+  cursor: pointer;
 
-  /* truncate */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  /* rounded */
-  border-radius: 10px; /* about 4px */
-
-  /* border and border-orange-200 */
+  /* Rounded borders */
+  border-radius: 10px;
   border-width: 1px;
   border-style: solid;
-  border-color: rgb(218, 8, 8, 0.3); /* approximate Tailwind orange-200 */
+  border-color: rgba(218, 8, 8, 0.3); /* Light border color */
 
-  /* bg-orange-50 */
-  background-color: rgb(
-    255,
-    186,
-    141,
-    0.5
-  ); /* approximate Tailwind orange-50 */
+  /* Background */
+  background-color: rgba(255, 186, 141, 0.5);
 
-  /* py-0.5 */
-  padding-top: 0.125rem; /* about 2px */
-  padding-bottom: 0.125rem;
+  /* Padding */
+  padding: 0.125rem 0.25rem; /* Equivalent to py-0.5 px-1 */
 
-  /* px-1 */
-  padding-left: 0.25rem; /* about 4px */
-  padding-right: 0.25rem;
-
-  /* font-mono */
+  /* Font */
   font-family: monospace;
-
-  /* text-xs */
-  font-size: 1rem; /* about 12px */
+  font-size: 1rem;
   line-height: 1rem;
-
-  /* text-orange-800 */
-  color: rgb(218, 8, 8); /* approximate Tailwind orange-800 */
-
-  /* opacity-90 */
+  color: rgb(218, 8, 8);
   opacity: 0.9;
+
+  /* Ensure text wraps properly */
+  display: inline-block;
+  max-width: 100%; /* Prevent overflow */
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Alternative for compatibility */
+  white-space: normal; /* Allow multi-line wrapping */
+}
+
+.selected-table-div p, 
+.selected-columns-div, 
+.selected-join-div p, 
+.selected-filter-div p {
+  display: flex; /* Maintain alignment */
+  flex-wrap: wrap; /* Wrap text to the next line */
+  align-items: center; /* Keep icons aligned */
+  gap: 5px; /* Add spacing between elements */
 }

@@ -166,22 +166,34 @@ export class AppComponent implements OnInit {
   selectedRightColumn = '';
   selectedJoinType = '';
   selectedJoinColumns: string[] = [];
-  joinTypes = ['Inner Join', 'Left Join', 'Right Join', 'Full Join'];
+  joinTypes = ['Inner', 'Left', 'Right', 'Full'];
+  joinType: string = this.joinTypes[0]; // Set default to 'Inner Join'
 
   selectedTableToAppend: string = '';
   dropDuplicates: string = 'No';
   customExpression: string = '';
 
   @ViewChild('overlay') overlay!: ElementRef;
-
+  obj:any=[];
   // API calls
   gettabledata() {
-    this.Apidata.GetTableApi().subscribe((res: any) => (this.tables = res));
+    this.Apidata.GetTableApi(this.obj).subscribe((res: any) => (this.tables = res,
+      console.log('Table Data:', res)
+    )
+  );
+
   }
   getcolumndata(table1: string) {
-    this.Apidata.GetColumnApi(table1).subscribe((res: any) => {
-      this.columns = res;
-      this.selectedColumns = [];
+    debugger;
+    this.Apidata.GetColumnApi(table1).subscribe({
+      next: (res: any) => {
+        this.columns = res;
+        console.log('Column data',res)
+        this.selectedColumns = [];
+      },
+      error: (err) => {
+        console.error("Error fetching column data:", err);
+      }
     });
   }
   getrightcolumndata(table1: string) {
@@ -194,9 +206,21 @@ export class AppComponent implements OnInit {
       this.tabledata = res;
     });
   }
+
+
+  Rtable: string = ''; // This will store the selected right table
   RightTable(Rtable: string) {
+    this.Rtable = Rtable;
     this.getrightcolumndata(Rtable);
   }
+
+  editTable(){
+    this.showTableOverlay=true;
+  }
+  editColumns(){
+   this.showColumnOverlay=true;
+  }
+
 
   // Query Methods
   addQueries() {
