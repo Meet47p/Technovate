@@ -416,4 +416,12 @@ export class AppComponent implements OnInit {
     console.log('Applied Groupings:', this.groupings);
     this.closeGroupSummarizeOverlay();
   }
+
+  editTable(){
+    this.showTableOverlay=true;
+  }
+  editColumn(){
+    this.showColumnOverlay=true;
+  }
+
 }

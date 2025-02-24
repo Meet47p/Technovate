@@ -446,14 +446,14 @@
           <div>
             <p>
               <i class="fa-solid fa-database opIcons"></i>Select
-              <span class="highlightValues">{{ selectedTable }}</span> Table
+              <span (click)="editTable()" class="highlightValues">{{ selectedTable }}</span> Table
             </p>
           </div>
           <div *ngIf="selectedColumns.length > 0">
             <div>
               <i class="fa-solid fa-table-columns opIcons"></i>
               Selected
-              <span class="highlightValues">
+              <span (click)="editColumn()" class="highlightValues">
                 {{ selectedColumns.length }} Columns</span
               >
             </div>
