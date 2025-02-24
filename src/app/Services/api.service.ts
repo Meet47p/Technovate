@@ -12,13 +12,13 @@ export class ApiService {
     return this.http.post('http://192.168.1.76:5300/api/Database/tables', payload);
   }
   GetColumnApi(selectedTable: string){
+    const payload = {tableName: selectedTable }
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post("http://192.168.1.76:5300/api/Database/fields",JSON.stringify(selectedTable),{headers});
   }
 
   GetData(selectedTable: string) {
-    return this.http.get(
-      `http://192.168.1.76:5300/api/Database/tables/${selectedTable}/distinct`
-    );
+    const payload = {tableName: selectedTable}
+    return this.http.post(`http://192.168.1.76:5400/api/Database/table-data`,payload);
   }
 }
