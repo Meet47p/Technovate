@@ -7,4 +7,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
-export class HeaderComponent {}
+export class HeaderComponent {
+  isDarkMode: boolean = false; // Initially set to light mode
+
+
+}

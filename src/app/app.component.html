@@ -453,7 +453,7 @@
           <div class="selected-columns-div">
             <i class="fa-solid fa-table-columns opIcons"></i>
             Selected
-            <span class="highlightValues">
+            <span class="highlightValues" >
               {{ selectedColumns.length }} Columns</span
             >
             <!-- <ul>
@@ -461,16 +461,17 @@
             </ul> -->
           </div>
           <div class="vertical-line1"></div>
-           <div>
-            <div class="selected-join-div">
+           <div *ngIf="selectedJoinType.length>0">
+            <div class="selected-join-div" >
               <p>
-                <i class="fa-solid fa-circle-half-stroke"></i>Join
-                <span class="highlightValues" >{{ selectedTable }}</span> table
+                <i class="fa-solid fa-circle-half-stroke"></i>
+                <span class="highlightValues">{{ selectedJoinType }}</span>join
+                <span class="highlightValues" >{{ Rtable  }}</span> table
               </p>
             </div>
-            <div class="vertical-line2"></div>
-            <div *ngIf="selectedColumns.length > 0">
-              <div class="selected-filter-div">
+            <div class="vertical-line2" ></div>
+            <div >
+              <div class="selected-filter-div"*ngIf="selectedColumns.length > 0">
                 <p>
                   <i class="fa-solid fa-filter"></i>Filter
                   <span class="highlightValues" *ngFor="let col of selectedColumns"> {{col}}</span> 

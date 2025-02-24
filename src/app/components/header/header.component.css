@@ -9,6 +9,7 @@
   text-align: center;
 }
 
+
 .header-container {
   border-bottom: 1px solid #ccc;
 }
@@ -20,6 +21,16 @@
 }
 
 .userIcon:hover {
+  transform: scale(1.1);
+  transition: transform 0.3s ease-in-out;
   color: #007bff;
   cursor: pointer;
 }
+.logo{
+  cursor: pointer;
+}
+.logo:hover{
+  transform: scale(1.1);
+  transition: transform 0.3s ease-in-out;
+}
+
