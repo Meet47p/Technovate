@@ -201,6 +201,13 @@ export class AppComponent implements OnInit {
     this.getrightcolumndata(Rtable);
   }
 
+  editTable(){
+    this.showTableOverlay=true;
+  }
+  editColumns(){
+   this.showColumnOverlay=true;
+  }
+
 
   // Query Methods
   addQueries() {

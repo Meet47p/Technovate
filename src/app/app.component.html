@@ -445,7 +445,7 @@
         <div class="selected-table-div">
           <p>
             <i class="fa-solid fa-database opIcons"></i>Select
-            <span class="highlightValues" >{{ selectedTable }}</span> 
+            <span class="highlightValues" (click)="editTable()" >{{ selectedTable }}</span> 
           </p>
         </div>
         <div class="vertical-line1" *ngIf="selectedColumns.length > 0"></div>
@@ -453,15 +453,15 @@
           <div class="selected-columns-div">
             <i class="fa-solid fa-table-columns opIcons"></i>
             Selected
-            <span class="highlightValues" >
+            <span class="highlightValues" (click)=" editColumns()" >
               {{ selectedColumns.length }} Columns</span
             >
             <!-- <ul>
               <li *ngFor="let col of selectedColumns">{{ col }}</li>
             </ul> -->
           </div>
-          <div class="vertical-line1"></div>
-           <div *ngIf="selectedJoinType.length>0">
+          <div class="vertical-line1" *ngIf="selectedJoinType.length>0"></div>
+           <div >
             <div class="selected-join-div" >
               <p>
                 <i class="fa-solid fa-circle-half-stroke"></i>
@@ -469,12 +469,12 @@
                 <span class="highlightValues" >{{ Rtable  }}</span> table
               </p>
             </div>
-            <div class="vertical-line2" ></div>
+            <div class="vertical-line2" *ngIf="selectedColumns.length > 0" ></div>
             <div >
-              <div class="selected-filter-div"*ngIf="selectedColumns.length > 0">
+              <div class="selected-filter-div">
                 <p>
                   <i class="fa-solid fa-filter"></i>Filter
-                  <span class="highlightValues" *ngFor="let col of selectedColumns"> {{col}}</span> 
+                  <span class="highlightValues" *ngFor="let col of selectedColumns" > {{col}}</span> 
                 </p>
               </div>
             </div>
