@@ -171,6 +171,7 @@ export class AppComponent implements OnInit {
       this.columns = res;
       this.selectedColumns = [];
     });
+    this.getdata();
   }
   getrightcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe(
@@ -197,6 +198,16 @@ export class AppComponent implements OnInit {
   openQuery(query: Query) {
     this.selectedQuery = query;
     this.queryTitle = query.name;
+    if (query.selectedTable) {
+      this.selectedTable = query.selectedTable;
+      this.getcolumndata(query.selectedTable);
+    }
+    else {
+      this.selectedTable = '';
+      this.selectedColumns = [];
+      this.columns = [];
+      this.tabledata = [];
+    }
   }
   updateSelectedQueryName() {
     if (this.selectedQuery) {
@@ -220,8 +231,8 @@ export class AppComponent implements OnInit {
     if (this.selectedQuery) {
       this.selectedQuery.selectedTable = table;
     }
-    console.log('Selected Table:', this.selectedTable);
     this.getcolumndata(table);
+    this.closeTableOverlay();
     this.getdata();
     this.showTableOverlay = false;
   }
@@ -242,6 +253,9 @@ export class AppComponent implements OnInit {
       this.selectedColumns = this.selectedColumns.filter(
         (col) => col !== column
       );
+    }
+    if(this.selectedQuery){
+      this.selectedColumns= this.selectedColumns;
     }
   }
   confirmColumnSelection() {
