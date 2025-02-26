@@ -1,12 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  HostListener,
-  OnInit,
-  ViewChild,
-  inject,
-} from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './Services/api.service';
 import { HeaderComponent } from './components/header/header.component';
@@ -26,11 +19,17 @@ interface Query {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
+
 export class AppComponent implements OnInit {
+  title = 'DynamicDahboard';
+
   ngOnInit(): void {
     this.gettabledata();
   }
-  title = 'DynamicDahboard';
+
+  Apidata = inject(ApiService);
+  payload: [] =[]
+  @ViewChild('overlay') overlay!: ElementRef;
 
   // Overlays and flags (unchanged)
   showOverlay = false;
@@ -43,12 +42,15 @@ export class AppComponent implements OnInit {
   showFilterRowsOverlay = false;
   showGroupSummarizeOverlay = false;
 
-  Apidata = inject(ApiService);
   tables: any[] = [];
   selectedTable: string = '';
 
   columns: string[] = [];
+  //Just for storing of column names and showing in column dropdown.
+  columnList:string[] = []
+  selectedColumns: string[] = [];
   rightcolumns: string[] = [];
+  
   tabledata: any[] = [];
 
   // ***** Query Management *****
@@ -72,46 +74,14 @@ export class AppComponent implements OnInit {
     { name: 'Quantity', type: 'integer', values: [1, 2, 5, 10] },
     { name: 'Price', type: 'decimal', values: [10.99, 20.5, 100.75] },
   ];
+
   operations: any = {
-    string: [
-      'is',
-      'is not',
-      'contains',
-      'does not contain',
-      'starts with',
-      'ends with',
-      'is set',
-      'is not set',
-    ],
-    DateTime: [
-      'equals',
-      'not equals',
-      'greater than',
-      'greater than or equals',
-      'less than',
-      'less than or equals',
-      'between',
-      'within',
-    ],
-    integer: [
-      'equals',
-      'not equals',
-      'greater than',
-      'greater than or equals',
-      'less than',
-      'less than or equals',
-      'between',
-    ],
-    decimal: [
-      'equals',
-      'not equals',
-      'greater than',
-      'greater than or equals',
-      'less than',
-      'less than or equals',
-      'between',
-    ],
+    string: [ 'is', 'is not', 'contains', 'does not contain', 'starts with', 'ends with', 'is set', 'is not set'],
+    DateTime: [ 'equals', 'not equals', 'greater than', 'greater than or equals', 'less than', 'less than or equals', 'between', 'within'],
+    integer: [ 'equals', 'not equals', 'greater than', 'greater than or equals', 'less than', 'less than or equals', 'between'],
+    decimal: [ 'equals', 'not equals', 'greater than', 'greater than or equals', 'less than', 'less than or equals', 'between'],
   };
+
   filters: any = [
     {
       column: '',
@@ -122,31 +92,14 @@ export class AppComponent implements OnInit {
       condition: 'AND',
     },
   ];
-  aggregateFunctions = [
-    'Count of',
-    'Sum of',
-    'Average of',
-    'Minimum of',
-    'Maximum of',
-    'Unique count of',
-  ];
-  groupings = [
-    { groupByColumn: '', aggregateFunction: '', aggregateColumn: '' },
-  ];
 
-  selectedColumns: string[] = [];
+  aggregateFunctions = ['Count of', 'Sum of', 'Average of', 'Minimum of', 'Maximum of', 'Unique count of'];
+  groupings = [{ groupByColumn: '', aggregateFunction: '', aggregateColumn: '' }];
+
   newColumnExpression = '';
   newColumnName = '';
   newColumnType = '';
-  columnTypes = [
-    'String',
-    'Text',
-    'Integer',
-    'Decimal',
-    'Date',
-    'Time',
-    'Datetime',
-  ];
+  columnTypes = ['String', 'Text', 'Integer', 'Decimal', 'Date', 'Time', 'Datetime'];
 
   selectedJoinTable = '';
   selectedLeftColumn = '';
@@ -159,15 +112,16 @@ export class AppComponent implements OnInit {
   dropDuplicates: string = 'No';
   customExpression: string = '';
 
-  @ViewChild('overlay') overlay!: ElementRef;
-  payload: [] =[]
+  
+  chartsCount: number = 0;
+  dashboardCount: number = 0;
 
-  // API calls
+  // GETTING TABLE NAMES.
   gettabledata() {
     this.Apidata.GetTableApi(this.payload).subscribe((res: any) => (this.tables = res));
   }
 
-  columnList:string[] = []
+  //GETTING COLUMN NAMES.
   getcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe((res: any) => {
       this.columnList = res;
@@ -175,11 +129,15 @@ export class AppComponent implements OnInit {
     });
     this.getdata();
   }
+
+  //GETTING COLUMN NAMES FOR RIGHT TABLE IN JOINING.
   getrightcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe(
       (res: any) => (this.rightcolumns = res)
     );
   }
+
+  //FOR GETTING FULL TABLE DATA.
   getdata() {
     this.Apidata.GetData(this.selectedTable).subscribe((res: any) => {
       this.columns = Object.keys(res[0]);
@@ -193,6 +151,8 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+
   RightTable(Rtable: string) {
     this.getrightcolumndata(Rtable);
   }
@@ -212,11 +172,6 @@ export class AppComponent implements OnInit {
     if (query.selectedTable) {
       this.selectedTable = query.selectedTable;
       this.getcolumndata(query.selectedTable);
-
-       // Ensure selectedColumns is set correctly
-      // this.selectedColumns = query.columns && query.columns.length > 0
-      // ? [...query.columns]
-      // : [...this.columns]; // Default to all columns if none are stored
     }
     else {
       this.selectedTable = '';
@@ -229,11 +184,13 @@ export class AppComponent implements OnInit {
     if (this.selectedQuery) {
       this.selectedQuery.name = this.queryTitle;
     }
-    // Clear the input after updating
-    // this.queryTitle = '';
+  }
+  deleteQuery(queryId: number): void {
+    this.queries = this.queries.filter((query) => query.id !== queryId);
+    // Optional: Confirm deletion with the user
   }
 
-  // Operations Methods (unchanged)
+
   toggleOverlay(event: Event) {
     this.showOverlay = !this.showOverlay;
     event.stopPropagation();
@@ -255,6 +212,8 @@ export class AppComponent implements OnInit {
   closeTableOverlay() {
     this.showTableOverlay = false;
   }
+
+
   openColumnOverlay() {
     this.showColumnOverlay = true;
     this.showOverlay = false;
@@ -281,6 +240,8 @@ export class AppComponent implements OnInit {
   closeColumnOverlay() {
     this.showColumnOverlay = false;
   }
+
+
   openAddColumnOverlay() {
     this.showAddColumnOverlay = true;
     this.showOverlay = false;
@@ -296,6 +257,8 @@ export class AppComponent implements OnInit {
   closeAddColumnOverlay() {
     this.showAddColumnOverlay = false;
   }
+
+
   openJoinTableOverlay() {
     this.showJoinTableOverlay = true;
     this.showOverlay = false;
@@ -313,13 +276,11 @@ export class AppComponent implements OnInit {
   closeJoinTableOverlay() {
     this.showJoinTableOverlay = false;
   }
+
+
   openAppendTableOverlay() {
     this.showAppendTableOverlay = true;
     this.showOverlay = false;
-  }
-  deleteQuery(queryId: number): void {
-    this.queries = this.queries.filter((query) => query.id !== queryId);
-    // Optional: Confirm deletion with the user
   }
   confirmAppendTable() {
     console.log('Selected Table to Append:', this.selectedTableToAppend);
@@ -329,6 +290,8 @@ export class AppComponent implements OnInit {
   closeAppendTableOverlay() {
     this.showAppendTableOverlay = false;
   }
+
+
   openCustomOperationOverlay() {
     this.showCustomOperationOverlay = true;
     this.showOverlay = false;
@@ -340,18 +303,8 @@ export class AppComponent implements OnInit {
   closeCustomOperationOverlay() {
     this.showCustomOperationOverlay = false;
   }
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event) {
-    if (
-      this.overlay &&
-      this.showOverlay &&
-      !this.overlay.nativeElement.contains(event.target)
-    ) {
-      this.showOverlay = false;
-    }
-  }
-  chartsCount: number = 0;
-  dashboardCount: number = 0;
+
+
   addCharts() {
     this.chartsCount++;
     const newChartDiv = document.createElement('div');
@@ -364,7 +317,8 @@ export class AppComponent implements OnInit {
     newDashboardDiv.textContent = `dashboard ${this.dashboardCount}`;
     document.getElementById('dashboardContainer')?.appendChild(newDashboardDiv);
   }
-  // Filter Rows and Grouping methods remain unchanged.
+
+
   openFilterRowsOverlay() {
     this.showFilterRowsOverlay = true;
     this.showOverlay = false;
@@ -420,6 +374,8 @@ export class AppComponent implements OnInit {
     console.log('Applied Filters:', this.filters);
     this.closeFilterRowsOverlay();
   }
+
+
   openGroupSummarizeOverlay() {
     this.showGroupSummarizeOverlay = true;
     this.showOverlay = false;
@@ -446,7 +402,6 @@ export class AppComponent implements OnInit {
     console.log('Applied Groupings:', this.groupings);
     this.closeGroupSummarizeOverlay();
   }
-
   editTable(){
     this.showTableOverlay=true;
   }
@@ -454,4 +409,15 @@ export class AppComponent implements OnInit {
     this.showColumnOverlay=true;
   }
 
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (
+      this.overlay &&
+      this.showOverlay &&
+      !this.overlay.nativeElement.contains(event.target)
+    ) {
+      this.showOverlay = false;
+    }
+  }
 }
