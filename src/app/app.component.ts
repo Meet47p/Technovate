@@ -166,9 +166,11 @@ export class AppComponent implements OnInit {
   gettabledata() {
     this.Apidata.GetTableApi(this.payload).subscribe((res: any) => (this.tables = res));
   }
+
+  columnList:string[] = []
   getcolumndata(table1: string) {
     this.Apidata.GetColumnApi(table1).subscribe((res: any) => {
-      this.columns = res;
+      this.columnList = res;
       this.selectedColumns = [];
     });
     this.getdata();
@@ -180,7 +182,15 @@ export class AppComponent implements OnInit {
   }
   getdata() {
     this.Apidata.GetData(this.selectedTable).subscribe((res: any) => {
+      this.columns = Object.keys(res[0]);
+      // this.getcolumndata(this.selectedTable);
       this.tabledata = res;
+      // Ensure selectedColumns updates based on the query's selection
+      if (this.selectedQuery?.columns?.length) {
+        this.selectedColumns = this.selectedQuery.columns.filter(col => this.columns.includes(col));
+      } else {
+        this.columns = [...this.columns]; // Default to all columns
+      }
     });
   }
   RightTable(Rtable: string) {
@@ -198,9 +208,15 @@ export class AppComponent implements OnInit {
   openQuery(query: Query) {
     this.selectedQuery = query;
     this.queryTitle = query.name;
+
     if (query.selectedTable) {
       this.selectedTable = query.selectedTable;
       this.getcolumndata(query.selectedTable);
+
+       // Ensure selectedColumns is set correctly
+      // this.selectedColumns = query.columns && query.columns.length > 0
+      // ? [...query.columns]
+      // : [...this.columns]; // Default to all columns if none are stored
     }
     else {
       this.selectedTable = '';
@@ -255,7 +271,7 @@ export class AppComponent implements OnInit {
       );
     }
     if(this.selectedQuery){
-      this.selectedColumns= this.selectedColumns;
+      this.selectedQuery.columns = [...this.selectedColumns];
     }
   }
   confirmColumnSelection() {
