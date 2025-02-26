@@ -127,7 +127,6 @@ export class AppComponent implements OnInit {
       this.columnList = res;
       this.selectedColumns = [];
     });
-    this.getdata();
   }
 
   //GETTING COLUMN NAMES FOR RIGHT TABLE IN JOINING.
@@ -172,6 +171,7 @@ export class AppComponent implements OnInit {
     if (query.selectedTable) {
       this.selectedTable = query.selectedTable;
       this.getcolumndata(query.selectedTable);
+      this.getdata();
     }
     else {
       this.selectedTable = '';
